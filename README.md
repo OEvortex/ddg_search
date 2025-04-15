@@ -10,14 +10,7 @@
 ---
 
 > [!IMPORTANT]
-> DuckDuckGo Search MCP supports two types of compatibility:
-> - <b>Native MCP Compatibility:</b> Use the full power of the Model Context Protocol for maximum flexibility.
-> - <b>OpenAI Compatibility:</b> Use with OpenAI-compatible interfaces and providers.
->
-> Choose the approach that best fits your needs! For OpenAI compatibility, check the <a href="webscout/Provider/OPENAI/README.md">OpenAI Providers README</a>.
-
-> [!NOTE]
-> DuckDuckGo Search MCP is compatible with Claude, Anthropic, OpenAI, Perplexity, HuggingFace, LLAMA, and 90+ other AI providers. All providers follow similar usage patterns with consistent interfaces.
+> DuckDuckGo Search MCP supports the Model Context Protocol (MCP) standard, making it compatible with various AI assistants and tools.
 
 ---
 
@@ -49,7 +42,7 @@ npx -y @oevortex/ddg_search
 </div>
 
 > [!TIP]
-> This will download and run the MCP server directly without installation – perfect for quick use with Claude, OpenAI, or other AI assistants.
+> This will download and run the MCP server directly without installation – perfect for quick use with AI assistants.
 
 ---
 
@@ -95,10 +88,10 @@ npx -y @oevortex/ddg_search --help
 
 ---
 
-## 🤖 Using with Claude, OpenAI, or Other MCP Clients
+## 🤖 Using with MCP Clients
 
 > [!IMPORTANT]
-> The most common way to use this tool is by integrating it with Claude, OpenAI, or other MCP-compatible AI assistants.
+> The most common way to use this tool is by integrating it with MCP-compatible AI assistants.
 
 Add the server to your MCP client configuration:
 
@@ -126,7 +119,7 @@ Or if installed globally:
 ```
 
 > [!TIP]
-> After configuring, restart your Claude Desktop or other MCP client to apply the changes.
+> After configuring, restart your MCP client to apply the changes.
 
 ---
 
