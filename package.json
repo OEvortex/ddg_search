@@ -1,6 +1,6 @@
 {
   "name": "@oevortex/ddg_search",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Model Context Protocol server for web search using DuckDuckGo",
   "main": "src/index.js",
   "bin": {
@@ -16,7 +16,16 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["mcp", "model-context-protocol", "duckduckgo", "search", "web-search", "claude", "ai", "llm"],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "duckduckgo",
+    "search",
+    "web-search",
+    "claude",
+    "ai",
+    "llm"
+  ],
   "author": "OEvortex",
   "license": "Apache-2.0",
   "type": "module",
