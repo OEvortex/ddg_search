@@ -1,0 +1,28 @@
+{
+  "name": "@OEvortex/ddg_search",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol server for web search using DuckDuckGo",
+  "main": "src/index.js",
+  "bin": {
+    "ddg-search-mcp": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bin/cli.js",
+    "prepublishOnly": "npm run lint",
+    "lint": "echo \"No linting configured\""
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["mcp", "model-context-protocol", "duckduckgo", "search", "web-search", "claude", "ai", "llm"],
+  "author": "OEvortex",
+  "license": "Apache-2.0",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.9.0",
+    "axios": "^1.8.4",
+    "cheerio": "^1.0.0",
+    "jsdom": "^26.1.0"
+  }
+}
