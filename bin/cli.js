@@ -100,7 +100,7 @@ if (helpFlag) {
 DuckDuckGo Search MCP - A Model Context Protocol server for web search
 
 Usage:
-  npx -y @OEvortex/ddg_search [options]
+  npx -y @oevortex/ddg_search [options]
 
 Options:
   -h, --help     Show this help message
