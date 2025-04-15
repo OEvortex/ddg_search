@@ -1,5 +1,5 @@
 {
-  "name": "@OEvortex/ddg_search",
+  "name": "@oevortex/ddg_search",
   "version": "1.0.0",
   "description": "A Model Context Protocol server for web search using DuckDuckGo",
   "main": "src/index.js",

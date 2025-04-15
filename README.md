@@ -1,10 +1,5 @@
-<!--
-  DuckDuckGo Search MCP - Modern README
-  Author: @OEvortex | License: Apache 2.0
--->
-
 <div align="center">
-  <img src="https://img.shields.io/npm/v/@OEvortex/ddg_search.svg" alt="npm version" />
+  <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
   <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
   <h1>DuckDuckGo Search MCP 🔍</h1>
@@ -28,7 +23,7 @@
 
 ## ✨ Features
 
-<div style="display: flex; flex-wrap: wrap; gap: 1.5em;">
+<div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">
   <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
   <div><b>📄 URL content extraction</b> with smart filtering</div>
   <div><b>📊 URL metadata extraction</b> (title, description, images)</div>
@@ -45,11 +40,11 @@
 
 ## 🚀 Quick Start
 
-<div style="background: #222; color: #fff; padding: 1em; border-radius: 8px;">
+<div style="background: #222; color: #fff; padding: 1.5em; border-radius: 8px; margin: 1.5em 0;">
 <b>Run instantly with npx:</b>
 
 ```bash
-npx -y @OEvortex/ddg_search
+npx -y @oevortex/ddg_search
 ```
 </div>
 
@@ -64,7 +59,7 @@ npx -y @OEvortex/ddg_search
 <summary><b>Global Installation</b></summary>
 
 ```bash
-npm install -g @OEvortex/ddg_search
+npm install -g @oevortex/ddg_search
 ```
 
 Run globally:
@@ -92,7 +87,7 @@ npm start
 ## 🧑‍💻 Command Line Options
 
 ```bash
-npx -y @OEvortex/ddg_search --help
+npx -y @oevortex/ddg_search --help
 ```
 
 > [!TIP]
@@ -112,7 +107,7 @@ Add the server to your MCP client configuration:
   "mcpServers": {
     "ddg-search": {
       "command": "npx",
-      "args": ["-y", "@OEvortex/ddg_search"]
+      "args": ["-y", "@oevortex/ddg_search"]
     }
   }
 }
@@ -137,8 +132,8 @@ Or if installed globally:
 
 ## 🧰 Tools Overview
 
-<div style="display: flex; flex-wrap: wrap; gap: 2em;">
-  <div>
+<div style="display: flex; flex-wrap: wrap; gap: 2.5em; margin: 1.5em 0;">
+  <div style="margin-bottom: 1.5em;">
     <b>🔍 Web Search Tool</b><br/>
     <code>web-search</code><br/>
     <ul>
@@ -148,7 +143,7 @@ Or if installed globally:
     </ul>
     <i>Example: Search the web for "climate change solutions"</i>
   </div>
-  <div>
+  <div style="margin-bottom: 1.5em;">
     <b>📄 Fetch URL Tool</b><br/>
     <code>fetch-url</code><br/>
     <ul>
@@ -161,7 +156,7 @@ Or if installed globally:
     </ul>
     <i>Example: Fetch the content from "https://example.com"</i>
   </div>
-  <div>
+  <div style="margin-bottom: 1.5em;">
     <b>📊 URL Metadata Tool</b><br/>
     <code>url-metadata</code><br/>
     <ul>
@@ -174,6 +169,7 @@ Or if installed globally:
 ---
 
 ## 📁 Project Structure
+
 
 ```text
 bin/              # Command-line interface
@@ -193,6 +189,7 @@ README.md
 
 ## 🤝 Contributing
 
+
 Contributions are welcome! Please open issues or submit pull requests.
 
 > [!NOTE]
@@ -201,6 +198,7 @@ Contributions are welcome! Please open issues or submit pull requests.
 ---
 
 ## 📺 YouTube Channel
+
 
 <div align="center">
   <a href="https://youtube.com/@OEvortex"><img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" /></a>
@@ -211,6 +209,7 @@ Contributions are welcome! Please open issues or submit pull requests.
 ---
 
 ## 📄 License
+
 
 Apache License 2.0
 
