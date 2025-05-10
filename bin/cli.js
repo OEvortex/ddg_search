@@ -14,14 +14,12 @@ async function startServer() {
     const { searchToolDefinition, searchToolHandler } = await import(`${modulePath}/tools/searchTool.js`);
     const { fetchUrlToolDefinition, fetchUrlToolHandler } = await import(`${modulePath}/tools/fetchUrlTool.js`);
     const { metadataToolDefinition, metadataToolHandler } = await import(`${modulePath}/tools/metadataTool.js`);
-    const { feloToolDefinition, feloToolHandler } = await import(`${modulePath}/tools/feloTool.js`);
-
-    // Create the MCP server
+    const { feloToolDefinition, feloToolHandler } = await import(`${modulePath}/tools/feloTool.js`);    // Create the MCP server
     const server = new Server({
       id: 'ddg-search-mcp',
       name: 'DuckDuckGo & Felo AI Search MCP',
       description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
-      version: '1.1.0'
+      version: '1.1.1'
     }, {
       capabilities: {
         tools: {}
@@ -74,9 +72,7 @@ async function startServer() {
           ]
         };
       }
-    });
-
-    // Display promotional message
+    });    // Display promotional message
     console.error('\n\x1b[36m╔════════════════════════════════════════════════════════════╗');
     console.error('║                                                            ║');
     console.error('║  \x1b[1m\x1b[31mDuckDuckGo & Felo AI Search MCP\x1b[0m\x1b[36m by \x1b[1m\x1b[33m@OEvortex\x1b[0m\x1b[36m       ║');
@@ -105,7 +101,7 @@ if (helpFlag) {
 DuckDuckGo & Felo AI Search MCP - A Model Context Protocol server for web search
 
 Usage:
-  npx -y @oevortex/ddg_search [options]
+  npx -y @oevortex/ddg_search@latest [options]
 
 Options:
   -h, --help     Show this help message

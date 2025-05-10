@@ -36,12 +36,12 @@
 <b>Run instantly with npx:</b>
 
 ```bash
-npx -y @oevortex/ddg_search
+npx -y @oevortex/ddg_search@latest
 ```
 </div>
 
 > [!TIP]
-> This will download and run the MCP server directly without installation – perfect for quick use with AI assistants.
+> This will download and run the latest version of the MCP server directly without installation – perfect for quick use with AI assistants.
 
 ---
 
@@ -79,7 +79,7 @@ npm start
 ## 🧑‍💻 Command Line Options
 
 ```bash
-npx -y @oevortex/ddg_search --help
+npx -y @oevortex/ddg_search@latest --help
 ```
 
 > [!TIP]
@@ -99,7 +99,7 @@ Add the server to your MCP client configuration:
   "mcpServers": {
     "ddg-search": {
       "command": "npx",
-      "args": ["-y", "@oevortex/ddg_search"]
+      "args": ["-y", "@oevortex/ddg_search@latest"]
     }
   }
 }

@@ -10,10 +10,10 @@ import { feloToolDefinition, feloToolHandler } from './tools/feloTool.js';
 
 // Create the MCP server
 const server = new Server({
-  id: 'websearch-mcp',
-  name: 'WebSearch MCP',
+  id: 'ddg-search-mcp',
+  name: 'DuckDuckGo & Felo AI Search MCP',
   description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
-  version: '1.1.0'
+  version: '1.1.1'
 }, {
   capabilities: {
     tools: {}
