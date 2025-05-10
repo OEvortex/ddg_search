@@ -1,9 +1,8 @@
 <div align="center">
   <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
-  <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
-  <h1>DuckDuckGo Search MCP 🔍</h1>
-  <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and URL content extraction using DuckDuckGo.</p>
+  <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />  <h1>DuckDuckGo & Felo AI Search MCP 🔍🧠</h1>
+  <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and AI-powered responses using DuckDuckGo and Felo AI.</p>
   <a href="https://youtube.com/@OEvortex"><strong>Subscribe for updates & tutorials</strong></a>
 </div>
 
@@ -16,8 +15,8 @@
 
 ## ✨ Features
 
-<div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">
-  <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
+<div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">  <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
+  <div><b>🧠 AI search</b> using Felo AI</div>
   <div><b>📄 URL content extraction</b> with smart filtering</div>
   <div><b>📊 URL metadata extraction</b> (title, description, images)</div>
   <div><b>⚡ Performance optimized</b> with caching</div>
@@ -137,6 +136,15 @@ Or if installed globally:
     <i>Example: Search the web for "climate change solutions"</i>
   </div>
   <div style="margin-bottom: 1.5em;">
+    <b>🧠 Felo AI Search Tool</b><br/>
+    <code>felo-search</code><br/>
+    <ul>
+      <li><b>query</b> (string, required): The search query or prompt</li>
+      <li><b>stream</b> (boolean, optional, default: false): Whether to stream the response</li>
+    </ul>
+    <i>Example: Search Felo AI for "Explain quantum computing in simple terms"</i>
+  </div>
+  <div style="margin-bottom: 1.5em;">
     <b>📄 Fetch URL Tool</b><br/>
     <code>fetch-url</code><br/>
     <ul>
@@ -172,8 +180,10 @@ src/
     searchTool.js
     fetchUrlTool.js
     metadataTool.js
+    feloTool.js
   utils/
     search.js     # Search and URL utilities
+    search_felo.js # Felo AI search utilities
 package.json
 README.md
 ```

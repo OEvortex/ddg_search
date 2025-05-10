@@ -6,13 +6,14 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { searchToolDefinition, searchToolHandler } from './tools/searchTool.js';
 import { fetchUrlToolDefinition, fetchUrlToolHandler } from './tools/fetchUrlTool.js';
 import { metadataToolDefinition, metadataToolHandler } from './tools/metadataTool.js';
+import { feloToolDefinition, feloToolHandler } from './tools/feloTool.js';
 
 // Create the MCP server
 const server = new Server({
   id: 'websearch-mcp',
   name: 'WebSearch MCP',
-  description: 'A Model Context Protocol server for web search using DuckDuckGo',
-  version: '1.0.0'
+  description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
+  version: '1.1.0'
 }, {
   capabilities: {
     tools: {}
@@ -25,7 +26,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       searchToolDefinition,
       fetchUrlToolDefinition,
-      metadataToolDefinition
+      metadataToolDefinition,
+      feloToolDefinition
     ]
   };
 });
@@ -34,8 +36,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     const { name, arguments: args } = request.params;
-    
-    // Route to the appropriate tool handler
+      // Route to the appropriate tool handler
     switch (name) {
       case 'web-search':
         return await searchToolHandler(args);
@@ -45,6 +46,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       
       case 'url-metadata':
         return await metadataToolHandler(args);
+      
+      case 'felo-search':
+        return await feloToolHandler(args);
       
       default:
         throw new Error(`Tool not found: ${name}`);

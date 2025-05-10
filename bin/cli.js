@@ -14,13 +14,14 @@ async function startServer() {
     const { searchToolDefinition, searchToolHandler } = await import(`${modulePath}/tools/searchTool.js`);
     const { fetchUrlToolDefinition, fetchUrlToolHandler } = await import(`${modulePath}/tools/fetchUrlTool.js`);
     const { metadataToolDefinition, metadataToolHandler } = await import(`${modulePath}/tools/metadataTool.js`);
+    const { feloToolDefinition, feloToolHandler } = await import(`${modulePath}/tools/feloTool.js`);
 
     // Create the MCP server
     const server = new Server({
       id: 'ddg-search-mcp',
-      name: 'DuckDuckGo Search MCP',
-      description: 'A Model Context Protocol server for web search using DuckDuckGo',
-      version: '1.0.0'
+      name: 'DuckDuckGo & Felo AI Search MCP',
+      description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
+      version: '1.1.0'
     }, {
       capabilities: {
         tools: {}
@@ -33,7 +34,8 @@ async function startServer() {
         tools: [
           searchToolDefinition,
           fetchUrlToolDefinition,
-          metadataToolDefinition
+          metadataToolDefinition,
+          feloToolDefinition
         ]
       };
     });
@@ -53,6 +55,9 @@ async function startServer() {
 
           case 'url-metadata':
             return await metadataToolHandler(args);
+          
+          case 'felo-search':
+            return await feloToolHandler(args);
 
           default:
             throw new Error(`Tool not found: ${name}`);
@@ -74,7 +79,7 @@ async function startServer() {
     // Display promotional message
     console.error('\n\x1b[36m╔════════════════════════════════════════════════════════════╗');
     console.error('║                                                            ║');
-    console.error('║  \x1b[1m\x1b[31mDuckDuckGo Search MCP\x1b[0m\x1b[36m by \x1b[1m\x1b[33m@OEvortex\x1b[0m\x1b[36m                     ║');
+    console.error('║  \x1b[1m\x1b[31mDuckDuckGo & Felo AI Search MCP\x1b[0m\x1b[36m by \x1b[1m\x1b[33m@OEvortex\x1b[0m\x1b[36m       ║');
     console.error('║                                                            ║');
     console.error('║  \x1b[0m👉 Subscribe to \x1b[1m\x1b[37myoutube.com/@OEvortex\x1b[0m\x1b[36m for more tools!  ║');
     console.error('║                                                            ║');
@@ -83,7 +88,7 @@ async function startServer() {
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error('DuckDuckGo Search MCP server started and listening on stdio');
+    console.error('DuckDuckGo & Felo AI Search MCP server started and listening on stdio');
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
@@ -97,7 +102,7 @@ const versionFlag = args.includes('--version') || args.includes('-v');
 
 if (helpFlag) {
   console.log(`
-DuckDuckGo Search MCP - A Model Context Protocol server for web search
+DuckDuckGo & Felo AI Search MCP - A Model Context Protocol server for web search
 
 Usage:
   npx -y @oevortex/ddg_search [options]
@@ -110,6 +115,7 @@ This MCP server provides the following tools:
   - web-search: Search the web using DuckDuckGo
   - fetch-url: Fetch and extract content from a URL
   - url-metadata: Extract metadata from a URL
+  - felo-search: Search using Felo AI for AI-generated responses
 
 Created by @OEvortex
 Subscribe to youtube.com/@OEvortex for more tools and tutorials!
@@ -127,7 +133,7 @@ if (versionFlag) {
         const packageJson = JSON.parse(
           await readFile(new URL('../package.json', import.meta.url), 'utf8')
         );
-        console.log(`DuckDuckGo Search MCP v${packageJson.version}\nCreated by @OEvortex - Subscribe to youtube.com/@OEvortex!`);
+        console.log(`DuckDuckGo & Felo AI Search MCP v${packageJson.version}\nCreated by @OEvortex - Subscribe to youtube.com/@OEvortex!`);
         process.exit(0);
       } catch (err) {
         console.error('Error reading version information:', err);
