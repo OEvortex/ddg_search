@@ -1,8 +1,12 @@
 <div align="center">
   <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
-  <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />  <h1>DuckDuckGo & Felo AI Search MCP 🔍🧠</h1>
+  <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
+  <h1>DuckDuckGo & Felo AI Search MCP 🔍🧠</h1>
   <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and AI-powered responses using DuckDuckGo and Felo AI.</p>
+  <a href="https://glama.ai/mcp/servers/@OEvortex/ddg_search">
+    <img width="380" height="200" src="https://glama.ai/mcp/servers/@OEvortex/ddg_search/badge" alt="DuckDuckGo Search MCP server" />
+  </a>
   <a href="https://youtube.com/@OEvortex"><strong>Subscribe for updates & tutorials</strong></a>
 </div>
 
