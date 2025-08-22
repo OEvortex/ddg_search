@@ -1,1 +1,12 @@
 runtime: typescript
+
+build:
+  external:
+    - canvas
+    - utf-8-validate
+    - bufferutil
+  esbuild:
+    bundle: true
+    platform: node
+    format: cjs
+    target: node18

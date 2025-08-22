@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { JSDOM } from 'jsdom';
+import * as cheerio from 'cheerio';
 import https from 'https';
 
 // Constants
@@ -168,22 +168,20 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
 
     const html = response.data;
 
-    // Parse results using JSDOM
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
+    // Parse results using cheerio
+    const $ = cheerio.load(html);
 
     const results = [];
-    const searchResults = document.querySelectorAll('.result');
+    $('.result').each((i, result) => {
+      const $result = $(result);
+      const titleEl = $result.find('.result__title a');
+      const linkEl = $result.find('.result__url');
+      const snippetEl = $result.find('.result__snippet');
 
-    searchResults.forEach((result) => {
-      const titleEl = result.querySelector('.result__title a');
-      const linkEl = result.querySelector('.result__url');
-      const snippetEl = result.querySelector('.result__snippet');
-
-      const title = titleEl?.textContent?.trim();
-      const rawLink = titleEl?.getAttribute('href');
-      const description = snippetEl?.textContent?.trim();
-      const displayUrl = linkEl?.textContent?.trim();
+      const title = titleEl.text()?.trim();
+      const rawLink = titleEl.attr('href');
+      const description = snippetEl.text()?.trim();
+      const displayUrl = linkEl.text()?.trim();
 
       const directLink = extractDirectUrl(rawLink || '');
       const favicon = getFaviconUrl(directLink);
@@ -259,13 +257,11 @@ async function fetchUrlContent(url, options = {}) {
     // If the content is HTML, extract the text content
     const contentType = response.headers['content-type'] || '';
     if (contentType.includes('text/html')) {
-      const dom = new JSDOM(response.data);
-      const document = dom.window.document;
+      const $ = cheerio.load(response.data);
 
       // Remove unwanted elements
       excludeTags.forEach(tag => {
-        const elements = document.querySelectorAll(tag);
-        elements.forEach(el => el.remove());
+        $(tag).remove();
       });
 
       // Remove ads and other common unwanted elements
@@ -278,8 +274,7 @@ async function fetchUrlContent(url, options = {}) {
 
       unwantedSelectors.forEach(selector => {
         try {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach(el => el.remove());
+          $(selector).remove();
         } catch (e) {
           // Ignore invalid selectors
         }
@@ -287,28 +282,21 @@ async function fetchUrlContent(url, options = {}) {
 
       // Handle links and images
       if (!includeLinks) {
-        const links = document.querySelectorAll('a');
-        links.forEach(link => {
-          const span = document.createElement('span');
-          span.textContent = link.textContent;
-          link.parentNode.replaceChild(span, link);
+        $('a').each((i, link) => {
+          $(link).replaceWith($(link).text());
         });
       }
 
       if (!includeImages) {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => img.remove());
+        $('img').remove();
       } else {
         // Replace images with their alt text
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-          const alt = img.getAttribute('alt');
+        $('img').each((i, img) => {
+          const alt = $(img).attr('alt');
           if (alt) {
-            const span = document.createElement('span');
-            span.textContent = `[Image: ${alt}]`;
-            img.parentNode.replaceChild(span, img);
+            $(img).replaceWith(`[Image: ${alt}]`);
           } else {
-            img.remove();
+            $(img).remove();
           }
         });
       }
@@ -323,16 +311,16 @@ async function fetchUrlContent(url, options = {}) {
         ];
 
         for (const selector of contentSelectors) {
-          const mainContent = document.querySelector(selector);
-          if (mainContent) {
+          const mainContent = $(selector).first();
+          if (mainContent.length > 0) {
             // Clean up the content
-            return cleanText(mainContent.textContent);
+            return cleanText(mainContent.text());
           }
         }
       }
 
       // If no main content found or not requested, use the body
-      return cleanText(document.body.textContent);
+      return cleanText($('body').text());
     }
 
     // For non-HTML content, return as is
@@ -377,16 +365,15 @@ async function extractUrlMetadata(url) {
       throw new Error(`Failed to fetch URL: ${url}`);
     }
 
-    const dom = new JSDOM(response.data);
-    const document = dom.window.document;
+    const $ = cheerio.load(response.data);
 
     // Extract metadata
-    const title = document.querySelector('title')?.textContent || '';
-    const description = document.querySelector('meta[name="description"]')?.getAttribute('content') ||
-                       document.querySelector('meta[property="og:description"]')?.getAttribute('content') || '';
-    const ogImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
-    const favicon = document.querySelector('link[rel="icon"]')?.getAttribute('href') ||
-                  document.querySelector('link[rel="shortcut icon"]')?.getAttribute('href') || '';
+    const title = $('title').text() || '';
+    const description = $('meta[name="description"]').attr('content') ||
+                       $('meta[property="og:description"]').attr('content') || '';
+    const ogImage = $('meta[property="og:image"]').attr('content') || '';
+    const favicon = $('link[rel="icon"]').attr('href') ||
+                  $('link[rel="shortcut icon"]').attr('href') || '';
 
     // Resolve relative URLs
     const resolvedFavicon = favicon ? new URL(favicon, url).href : getFaviconUrl(url);

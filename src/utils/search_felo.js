@@ -24,6 +24,28 @@ const httpsAgent = new https.Agent({
   secureProtocol: 'TLSv1_2_method'
 });
 
+// Create a persistent axios instance to maintain session state
+const feloSession = axios.create({
+  timeout: 30000,
+  httpsAgent: httpsAgent,
+  headers: {
+    'accept': '*/*',
+    'accept-encoding': 'gzip, deflate, br, zstd',
+    'accept-language': 'en-US,en;q=0.9,en-IN;q=0.8',
+    'content-type': 'application/json',
+    'dnt': '1',
+    'origin': 'https://felo.ai',
+    'referer': 'https://felo.ai/',
+    'sec-ch-ua': '"Not)A;Brand";v="99", "Microsoft Edge";v="127", "Chromium";v="127"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'same-site',
+    'user-agent': getRandomUserAgent()
+  }
+});
+
 /**
  * Response class for Felo API responses
  */
@@ -95,50 +117,37 @@ async function searchFelo(prompt, stream = false, raw = false) {
     }
   }
 
-  // Create payload for Felo API
+  // Create payload for Felo API with proper structure from reference
   const payload = {
     query: prompt,
-    search_uuid: uuidv4(),
+    search_uuid: uuidv4().replace(/-/g, ''), // Remove dashes like in reference
     lang: "",
     agent_lang: "en",
     search_options: {
-      langcode: "en-US"
+      langcode: "en-US",
+      search_image: true,
+      search_video: true
     },
     search_video: true,
-    contexts_from: "google"
+    model: "",
+    contexts_from: "google",
+    auto_routing: true
   };
 
-  // Get a random user agent
-  const userAgent = getRandomUserAgent();
-
-  // Headers for the request
-  const headers = {
-    'accept': '*/*',
-    'accept-encoding': 'gzip, deflate, br',
-    'accept-language': 'en-US,en;q=0.9',
-    'content-type': 'application/json',
-    'cookie': '_clck=1gifk45%7C2%7Cfoa%7C0%7C1686; _clsk=1g5lv07%7C1723558310439%7C1%7C1%7Cu.clarity.ms%2Fcollect; _ga=GA1.1.877307181.1723558313; _ga_8SZPRV97HV=GS1.1.1723558313.1.1.1723558341.0.0.0; _ga_Q9Q1E734CC=GS1.1.1723558313.1.1.1723558341.0.0.0',
-    'dnt': '1',
-    'origin': 'https://felo.ai',
-    'referer': 'https://felo.ai/',
-    'sec-ch-ua': '"Not)A;Brand";v="99", "Microsoft Edge";v="127", "Chromium";v="127"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Windows"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
-    'user-agent': userAgent
-  };
+  // Update user agent for this request
+  feloSession.defaults.headers['user-agent'] = getRandomUserAgent();
 
   // Define the streaming function
   async function* streamFunction() {
     try {
-      const response = await axios.post('https://api.felo.ai/search/threads', payload, {
-        headers,
-        timeout: 30000, // 30 second timeout
-        responseType: 'stream',
-        httpsAgent: httpsAgent
+      const response = await feloSession.post('https://api.felo.ai/search/threads', payload, {
+        responseType: 'stream'
       });
+
+      // Check for HTTP errors
+      if (response.status !== 200) {
+        throw new Error(`Failed to generate response - (${response.status}, ${response.statusText}) - ${response.data}`);
+      }
 
       let streamingText = '';
       let buffer = '';
@@ -153,22 +162,26 @@ async function searchFelo(prompt, stream = false, raw = false) {
         for (const line of lines) {
           if (line.startsWith('data:')) {
             try {
-              const data = JSON.parse(line.substring(5).trim());
-              if (data.type === 'answer' && 'text' in data.data) {
-                const newText = data.data.text;
-                if (newText.length > streamingText.length) {
-                  const delta = newText.substring(streamingText.length);
-                  streamingText = newText;
-                  
-                  if (raw) {
-                    yield { text: delta };
-                  } else {
-                    yield new Response(delta).toString();
+              const dataStr = line.substring(5).trim();
+              if (dataStr) {
+                const data = JSON.parse(dataStr);
+                if (data.type === 'answer' && 'text' in data.data) {
+                  const newText = data.data.text;
+                  if (newText.length > streamingText.length) {
+                    const delta = newText.substring(streamingText.length);
+                    streamingText = newText;
+                    
+                    if (raw) {
+                      yield { text: delta };
+                    } else {
+                      yield new Response(delta).toString();
+                    }
                   }
                 }
               }
             } catch (error) {
               // Ignore JSON parse errors and continue
+              console.debug('JSON parse error:', error.message);
             }
           }
         }
@@ -184,6 +197,15 @@ async function searchFelo(prompt, stream = false, raw = false) {
       
     } catch (error) {
       console.error('Error searching Felo:', error.message);
+      
+      // Handle specific API errors
+      if (error.response) {
+        const status = error.response.status;
+        const statusText = error.response.statusText;
+        const data = error.response.data;
+        throw new Error(`Felo API error: ${status} ${statusText} - ${data}`);
+      }
+      
       throw new Error(`Failed to search Felo: ${error.message}`);
     }
   }
