@@ -2,7 +2,20 @@ name: ddg-search-mcp
 description: DuckDuckGo & Felo AI Search MCP server for web search
 version: 1.1.2
 entry: src/index.js
-language: nodejs
+runtime: typescript
+env:
+  NODE_ENV: production
+startCommand:
+  type: http
+  configSchema:
+    type: object
+    required: []
+    properties:
+      port:
+        type: integer
+        title: Server Port
+        description: Port to run the MCP server on
+        default: 3000
 tools:
   - name: web-search
     description: DuckDuckGo web search tool
