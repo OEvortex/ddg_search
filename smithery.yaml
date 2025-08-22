@@ -2,7 +2,7 @@ name: ddg-search-mcp
 description: DuckDuckGo & Felo AI Search MCP server for web search
 version: 1.1.2
 entry: src/index.js
-runtime: typescript
+runtime: container
 env:
   NODE_ENV: production
 startCommand:
