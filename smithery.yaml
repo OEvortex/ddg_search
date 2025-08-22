@@ -1,0 +1,14 @@
+name: ddg-search-mcp
+description: DuckDuckGo & Felo AI Search MCP server for web search
+version: 1.1.2
+entry: src/index.js
+language: nodejs
+tools:
+  - name: web-search
+    description: DuckDuckGo web search tool
+  - name: fetch-url
+    description: Fetch content from a URL
+  - name: url-metadata
+    description: Extract metadata from a URL
+  - name: felo-search
+    description: Felo AI web search tool
