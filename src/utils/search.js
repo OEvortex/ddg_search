@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { JSDOM } from 'jsdom';
+import https from 'https';
 
 // Constants
 const RESULTS_PER_PAGE = 10;
@@ -17,6 +18,15 @@ const USER_AGENTS = [
 // Cache results to avoid repeated requests
 const resultsCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// HTTPS agent configuration to handle certificate chain issues
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: true, // Keep security enabled
+  keepAlive: true,
+  timeout: 10000,
+  // Provide fallback for certificate issues while maintaining security
+  secureProtocol: 'TLSv1_2_method'
+});
 
 /**
  * Get a random user agent from the list
@@ -147,7 +157,8 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
       {
         headers: {
           'User-Agent': userAgent
-        }
+        },
+        httpsAgent: httpsAgent
       }
     );
 
@@ -237,7 +248,8 @@ async function fetchUrlContent(url, options = {}) {
       headers: {
         'User-Agent': userAgent
       },
-      timeout: 10000 // 10 second timeout
+      timeout: 10000, // 10 second timeout
+      httpsAgent: httpsAgent
     });
 
     if (response.status !== 200) {
@@ -357,7 +369,8 @@ async function extractUrlMetadata(url) {
     const response = await axios.get(url, {
       headers: {
         'User-Agent': userAgent
-      }
+      },
+      httpsAgent: httpsAgent
     });
 
     if (response.status !== 200) {

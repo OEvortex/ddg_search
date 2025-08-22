@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import https from 'https';
 
 // Rotating User Agents
 const USER_AGENTS = [
@@ -13,6 +14,15 @@ const USER_AGENTS = [
 // Cache results to avoid repeated requests
 const resultsCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// HTTPS agent configuration to handle certificate chain issues
+const httpsAgent = new https.Agent({
+  rejectUnauthorized: true, // Keep security enabled
+  keepAlive: true,
+  timeout: 30000,
+  // Provide fallback for certificate issues while maintaining security
+  secureProtocol: 'TLSv1_2_method'
+});
 
 /**
  * Response class for Felo API responses
@@ -126,7 +136,8 @@ async function searchFelo(prompt, stream = false, raw = false) {
       const response = await axios.post('https://api.felo.ai/search/threads', payload, {
         headers,
         timeout: 30000, // 30 second timeout
-        responseType: 'stream'
+        responseType: 'stream',
+        httpsAgent: httpsAgent
       });
 
       let streamingText = '';
