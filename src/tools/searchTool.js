@@ -5,34 +5,30 @@ import { searchDuckDuckGo } from '../utils/search.js';
  */
 export const searchToolDefinition = {
   name: 'web-search',
-  description: 'Search the web using DuckDuckGo and return results',
+  title: 'Web Search',
+  description: 'Search the web using DuckDuckGo and return comprehensive results with titles, URLs, and snippets',
   inputSchema: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: 'The search query'
+        description: 'The search query to find relevant web pages'
       },
       page: {
         type: 'integer',
-        description: 'Page number (default: 1)',
+        description: 'Page number for pagination (default: 1)',
         default: 1,
         minimum: 1
       },
       numResults: {
         type: 'integer',
-        description: 'Number of results to return (default: 10)',
+        description: 'Number of results to return per page (default: 10, max: 20)',
         default: 10,
         minimum: 1,
         maximum: 20
       }
     },
     required: ['query']
-  },
-  annotations: {
-    title: 'Web Search',
-    readOnlyHint: true,
-    openWorldHint: true
   }
 };
 

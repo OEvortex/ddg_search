@@ -5,21 +5,17 @@ import { extractUrlMetadata } from '../utils/search.js';
  */
 export const metadataToolDefinition = {
   name: 'url-metadata',
-  description: 'Extract metadata from a URL (title, description, etc.)',
+  title: 'URL Metadata Extractor',
+  description: 'Extract metadata from a URL including title, description, Open Graph data, and favicon information',
   inputSchema: {
     type: 'object',
     properties: {
       url: {
         type: 'string',
-        description: 'The URL to extract metadata from'
+        description: 'The URL to extract metadata from (must be a valid HTTP/HTTPS URL)'
       }
     },
     required: ['url']
-  },
-  annotations: {
-    title: 'URL Metadata',
-    readOnlyHint: true,
-    openWorldHint: true
   }
 };
 

@@ -5,7 +5,8 @@ import { searchFelo } from '../utils/search_felo.js';
  */
 export const feloToolDefinition = {
   name: 'felo-search',
-  description: 'Advanced web search tool for technical intelligence. Retrieves up-to-date information from the web, including latest software releases, security advisories, migration guides, benchmarks, developer documentation, and community insights. Designed for function calling and automation, it provides structured, relevant results for engineering, DevOps, and research workflows. Supports both standard and streaming responses for real-time data consumption.',
+  title: 'Felo AI Advanced Search',
+  description: 'Advanced AI-powered web search for technical intelligence. Retrieves up-to-date information including software releases, security advisories, migration guides, benchmarks, developer documentation, and community insights. Supports both standard and streaming responses.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -20,11 +21,6 @@ export const feloToolDefinition = {
       }
     },
     required: ['query']
-  },
-  annotations: {
-    title: 'Felo AI Advanced Web Search',
-    readOnlyHint: 'Results are read-only and cannot be modified. Use for information retrieval only.',
-    openWorldHint: 'Searches the open web and technical sources for the most current and relevant data. Not limited to a fixed dataset.'
   }
 };
 

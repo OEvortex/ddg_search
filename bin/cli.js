@@ -19,29 +19,47 @@ async function startServer() {
       id: 'ddg-search-mcp',
       name: 'DuckDuckGo & Felo AI Search MCP',
       description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
-      version: '1.1.1'
+      version: '1.1.2'
     }, {
       capabilities: {
-        tools: {}
+        tools: {
+          listChanged: true
+        }
       }
     });
+
+    // Global variable to track available tools
+    let availableTools = [
+      searchToolDefinition,
+      fetchUrlToolDefinition,
+      metadataToolDefinition,
+      feloToolDefinition
+    ];
 
     // Define available tools
     server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
-        tools: [
-          searchToolDefinition,
-          fetchUrlToolDefinition,
-          metadataToolDefinition,
-          feloToolDefinition
-        ]
+        tools: availableTools
       };
     });
+
+    // Function to notify clients when tools list changes
+    function notifyToolsChanged() {
+      server.notification({
+        method: 'notifications/tools/list_changed'
+      });
+    }
 
     // Handle tool execution
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
         const { name, arguments: args } = request.params;
+        
+        // Validate tool name
+        const validTools = ['web-search', 'fetch-url', 'url-metadata', 'felo-search'];
+        if (!validTools.includes(name)) {
+          throw new Error(`Unknown tool: ${name}`);
+        }
 
         // Route to the appropriate tool handler
         switch (name) {
@@ -61,13 +79,15 @@ async function startServer() {
             throw new Error(`Tool not found: ${name}`);
         }
       } catch (error) {
-        console.error(`Error handling ${request.params.name} request:`, error);
+        console.error(`Error handling ${request.params.name} tool call:`, error);
+        
+        // Return proper tool execution error format
         return {
           isError: true,
           content: [
             {
               type: 'text',
-              text: `Error: ${error.message}`
+              text: `Error executing tool '${request.params.name}': ${error.message}`
             }
           ]
         };
