@@ -7,21 +7,23 @@ import { fetchUrlToolDefinition, fetchUrlToolHandler } from './tools/fetchUrlToo
 import { metadataToolDefinition, metadataToolHandler } from './tools/metadataTool.js';
 import { feloToolDefinition, feloToolHandler } from './tools/feloTool.js';
 
-// Global variable to track available tools
-let availableTools = [
-  searchToolDefinition,
-  fetchUrlToolDefinition,
-  metadataToolDefinition,
-  feloToolDefinition
-];
-
 // Required: Export default createServer function for Smithery
-export default function createServer({ config }: { config?: any }) {
-  // Create the MCP server
+export default function createServer({ config }: { config?: any } = {}) {
+  console.log('Creating MCP server with latest SDK...');
+  
+  // Global variable to track available tools
+  const availableTools = [
+    searchToolDefinition,
+    fetchUrlToolDefinition,
+    metadataToolDefinition,
+    feloToolDefinition
+  ];
+  
+  console.log('Available tools:', availableTools.map(t => t.name));
+
+  // Create the MCP server using the Server class
   const server = new Server({
-    id: 'ddg-search-mcp',
-    name: 'DuckDuckGo & Felo AI Search MCP',
-    description: 'A Model Context Protocol server for web search using DuckDuckGo and Felo AI',
+    name: 'ddg-search-mcp',
     version: '1.1.2'
   }, {
     capabilities: {
@@ -33,29 +35,18 @@ export default function createServer({ config }: { config?: any }) {
 
   // Define available tools
   server.setRequestHandler(ListToolsRequestSchema, async () => {
+    console.log('Tools list requested, returning:', availableTools.length, 'tools');
     return {
       tools: availableTools
     };
   });
 
-  // Function to notify clients when tools list changes
-  function notifyToolsChanged() {
-    server.notification({
-      method: 'notifications/tools/list_changed'
-    });
-  }
-
   // Handle tool execution
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     try {
       const { name, arguments: args } = request.params;
+      console.log(`Tool call received: ${name} with args:`, args);
       
-      // Validate tool name
-      const validTools = ['web-search', 'fetch-url', 'url-metadata', 'felo-search'];
-      if (!validTools.includes(name)) {
-        throw new Error(`Unknown tool: ${name}`);
-      }
-        
       // Route to the appropriate tool handler
       switch (name) {
         case 'web-search':
@@ -89,7 +80,9 @@ export default function createServer({ config }: { config?: any }) {
     }
   });
 
-  // Return the server object (required for Smithery)
+  console.log('MCP server created successfully');
+  
+  // Return the server instance (required for Smithery)
   return server;
 }
 
