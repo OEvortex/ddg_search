@@ -21,6 +21,10 @@ export const feloToolDefinition = {
       }
     },
     required: ['query']
+  },
+  annotations: {
+    readOnlyHint: "true",
+    openWorldHint: "false"
   }
 };
 
