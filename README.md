@@ -1,12 +1,22 @@
 <div align="center">
-  <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
-  <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
-  <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
-  <h1>DuckDuckGo & IAsk AI Search MCP 🔍🧠</h1>
-  <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and AI-powered responses using DuckDuckGo and IAsk AI.</p>
+  <a href="https://www.npmjs.com/package/@oevortex/ddg_search">
+    <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
+  </a>
+  <a href="https://github.com/OEvortex/ddg_search/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
+  </a>
+  <a href="https://youtube.com/@OEvortex">
+    <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
+  </a>
+  <h1>DuckDuckGo & IAsk AI Search MCP <span style="font-size:2.2rem;">🔍🧠</span></h1>
+  <p style="font-size:1.15rem; max-width:600px; margin:0 auto;">
+    <strong>Lightning-fast, privacy-first Model Context Protocol (MCP) server for web search and AI-powered answers.<br>
+    Powered by DuckDuckGo and IAsk AI.</strong>
+  </p>
   <a href="https://glama.ai/mcp/servers/@OEvortex/ddg_search">
     <img width="380" height="200" src="https://glama.ai/mcp/servers/@OEvortex/ddg_search/badge" alt="DuckDuckGo Search MCP server" />
   </a>
+  <br>
   <a href="https://youtube.com/@OEvortex"><strong>Subscribe for updates & tutorials</strong></a>
 </div>
 
@@ -27,6 +37,7 @@
   <div><b>🆓 No API keys required</b> - works out of the box</div>
 </div>
 
+
 > [!IMPORTANT]
 > Unlike many search tools, this package performs actual web scraping rather than using limited APIs, giving you more comprehensive results.
 
@@ -41,6 +52,7 @@
 npx -y @oevortex/ddg_search@latest
 ```
 </div>
+
 
 > [!TIP]
 > This will download and run the latest version of the MCP server directly without installation – perfect for quick use with AI assistants.

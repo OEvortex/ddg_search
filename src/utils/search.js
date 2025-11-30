@@ -3,7 +3,6 @@ import * as cheerio from 'cheerio';
 import https from 'https';
 
 // Constants
-const RESULTS_PER_PAGE = 10;
 const MAX_CACHE_PAGES = 5;
 
 // Rotating User Agents
@@ -37,13 +36,12 @@ function getRandomUserAgent() {
 }
 
 /**
- * Generate a cache key for a search query and page
+ * Generate a cache key for a search query
  * @param {string} query - The search query
- * @param {number} page - The page number
  * @returns {string} The cache key
  */
-function getCacheKey(query, page) {
-  return `${query}-${page}`;
+function getCacheKey(query) {
+  return `${query}`;
 }
 
 /**
@@ -125,23 +123,20 @@ function getFaviconUrl(url) {
   }
 }
 
+
 /**
  * Scrapes search results from DuckDuckGo HTML
  * @param {string} query - The search query
- * @param {number} page - The page number (default: 1)
  * @param {number} numResults - Number of results to return (default: 10)
  * @returns {Promise<Array>} - Array of search results
  */
-async function searchDuckDuckGo(query, page = 1, numResults = 10) {
+async function searchDuckDuckGo(query, numResults = 10, mode = 'short') {
   try {
     // Clear old cache entries
     clearOldCache();
 
-    // Calculate start index for pagination
-    const startIndex = (page - 1) * RESULTS_PER_PAGE;
-
     // Check cache first
-    const cacheKey = getCacheKey(query, page);
+    const cacheKey = getCacheKey(query);
     const cachedResults = resultsCache.get(cacheKey);
 
     if (cachedResults && Date.now() - cachedResults.timestamp < CACHE_DURATION) {
@@ -153,7 +148,7 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
 
     // Fetch results
     const response = await axios.get(
-      `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}&s=${startIndex}`,
+      `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`,
       {
         headers: {
           'User-Agent': userAgent
@@ -172,6 +167,7 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
     const $ = cheerio.load(html);
 
     const results = [];
+    const jinaFetchPromises = [];
     $('.result').each((i, result) => {
       const $result = $(result);
       const titleEl = $result.find('.result__title a');
@@ -185,24 +181,69 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
 
       const directLink = extractDirectUrl(rawLink || '');
       const favicon = getFaviconUrl(directLink);
+      const jinaUrl = getJinaAiUrl(directLink);
 
       if (title && directLink) {
-        results.push({
-          title,
-          url: directLink,
-          snippet: description || '',
-          favicon: favicon,
-          displayUrl: displayUrl || ''
-        });
+        if (mode === 'detailed') {
+          jinaFetchPromises.push(
+            axios.get(jinaUrl, {
+              headers: {
+                'User-Agent': getRandomUserAgent()
+              },
+              httpsAgent: httpsAgent,
+              timeout: 10000
+            })
+            .then(jinaRes => {
+              let jinaContent = '';
+              if (jinaRes.status === 200 && typeof jinaRes.data === 'string') {
+                const $jina = cheerio.load(jinaRes.data);
+                jinaContent = $jina('body').text()
+              }
+              return {
+                title,
+                url: directLink,
+                snippet: description || '',
+                favicon: favicon,
+                displayUrl: displayUrl || '',
+                Description: jinaContent
+              };
+            })
+            .catch(() => {
+              return {
+                title,
+                url: directLink,
+                snippet: description || '',
+                favicon: favicon,
+                displayUrl: displayUrl || '',
+                Description: ''
+              };
+            })
+          );
+        } else {
+          // short mode: omit Description
+          jinaFetchPromises.push(
+            Promise.resolve({
+              title,
+              url: directLink,
+              snippet: description || '',
+              favicon: favicon,
+              displayUrl: displayUrl || ''
+            })
+          );
+        }
       }
     });
 
-    // Get paginated results
-    const paginatedResults = results.slice(0, numResults);
+    // Wait for all Jina AI fetches to complete
+    const jinaResults = await Promise.all(jinaFetchPromises);
+    results.push(...jinaResults);
+
+    // Get limited results
+    const limitedResults = results.slice(0, numResults);
 
     // Cache the results
     resultsCache.set(cacheKey, {
-      results: paginatedResults,
+      results: limitedResults,
       timestamp: Date.now()
     });
 
@@ -212,7 +253,7 @@ async function searchDuckDuckGo(query, page = 1, numResults = 10) {
       resultsCache.delete(oldestKey);
     }
 
-    return paginatedResults;
+    return limitedResults;
   } catch (error) {
     console.error('Error searching DuckDuckGo:', error.message);
     throw error;
@@ -225,3 +266,19 @@ export {
   extractDirectUrl,
   getFaviconUrl
 };
+
+/**
+ * Generate a Jina AI URL for a given website URL
+ * @param {string} url - The website URL
+ * @returns {string} The Jina AI URL
+ */
+function getJinaAiUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    return `https://r.jina.ai/${urlObj.href}`;
+  } catch {
+    return '';
+  }
+}
+
+export { getJinaAiUrl };

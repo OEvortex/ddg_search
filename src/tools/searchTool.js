@@ -6,26 +6,26 @@ import { searchDuckDuckGo } from '../utils/search.js';
 export const searchToolDefinition = {
   name: 'web-search',
   title: 'Web Search',
-  description: 'Search the web using DuckDuckGo and return comprehensive results with titles, URLs, and snippets',
+  description: 'Perform a web search using DuckDuckGo and receive detailed results including titles, URLs, and summaries.',
   inputSchema: {
     type: 'object',
     properties: {
       query: {
         type: 'string',
-        description: 'The search query to find relevant web pages'
-      },
-      page: {
-        type: 'integer',
-        description: 'Page number for pagination (default: 1)',
-        default: 1,
-        minimum: 1
+        description: 'Enter your search query to find the most relevant web pages.'
       },
       numResults: {
         type: 'integer',
-        description: 'Number of results to return per page (default: 10, max: 20)',
-        default: 10,
+        description: 'Specify how many results to display (default: 3, maximum: 20).',
+        default: 3,
         minimum: 1,
         maximum: 20
+      },
+      mode: {
+        type: 'string',
+        description: "Choose 'short' for basic results (no Description) or 'detailed' for full results (includes Description).",
+        enum: ['short', 'detailed'],
+        default: 'short'
       }
     },
     required: ['query']
@@ -38,22 +38,17 @@ export const searchToolDefinition = {
  * @returns {Promise<Object>} - The tool result
  */
 export async function searchToolHandler(params) {
-  const { query, page = 1, numResults = 10 } = params;
-  console.log(`Searching for: ${query} (page ${page}, ${numResults} results)`);
-  
-  const results = await searchDuckDuckGo(query, page, numResults);
+  const { query, numResults = 3, mode = 'short' } = params;
+  console.log(`Searching for: ${query} (${numResults} results, mode: ${mode})`);
+
+  const results = await searchDuckDuckGo(query, numResults, mode);
   console.log(`Found ${results.length} results`);
-  
-  // Format the results for display
-  const formattedResults = results.map((result, index) => 
-    `${index + 1}. [${result.title}](${result.url})\n   ${result.snippet}`
-  ).join('\n\n');
-  
+
   return {
     content: [
       {
         type: 'text',
-        text: formattedResults || 'No results found.'
+        text: JSON.stringify(results)
       }
     ]
   };
