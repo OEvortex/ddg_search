@@ -2,8 +2,8 @@
   <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
   <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0" />
   <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
-  <h1>DuckDuckGo & Felo AI Search MCP 🔍🧠</h1>
-  <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and AI-powered responses using DuckDuckGo and Felo AI.</p>
+  <h1>DuckDuckGo & IAsk AI Search MCP 🔍🧠</h1>
+  <p>A blazing-fast, privacy-friendly Model Context Protocol (MCP) server for web search and AI-powered responses using DuckDuckGo and IAsk AI.</p>
   <a href="https://glama.ai/mcp/servers/@OEvortex/ddg_search">
     <img width="380" height="200" src="https://glama.ai/mcp/servers/@OEvortex/ddg_search/badge" alt="DuckDuckGo Search MCP server" />
   </a>
@@ -20,9 +20,7 @@
 ## ✨ Features
 
 <div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">  <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
-  <div><b>🧠 AI search</b> using Felo AI</div>
-  <div><b>📄 URL content extraction</b> with smart filtering</div>
-  <div><b>📊 URL metadata extraction</b> (title, description, images)</div>
+  <div><b>🧠 AI search</b> using IAsk AI</div>
   <div><b>⚡ Performance optimized</b> with caching</div>
   <div><b>🛡️ Security features</b> including rate limiting and rotating user agents</div>
   <div><b>🔌 MCP-compliant</b> server implementation</div>
@@ -52,10 +50,40 @@ npx -y @oevortex/ddg_search@latest
 ## 🛠️ Installation Options
 
 <details>
-<summary><b>Global Installation</b></summary>
+<summary><b>Global Installation (npm)</b></summary>
 
 ```bash
 npm install -g @oevortex/ddg_search
+```
+
+Run globally:
+
+```bash
+ddg-search-mcp
+```
+
+</details>
+
+<details>
+<summary><b>Global Installation (Yarn)</b></summary>
+
+```bash
+yarn global add @oevortex/ddg_search
+```
+
+Run globally:
+
+```bash
+ddg-search-mcp
+```
+
+</details>
+
+<details>
+<summary><b>Global Installation (pnpm)</b></summary>
+
+```bash
+pnpm add -g @oevortex/ddg_search
 ```
 
 Run globally:
@@ -74,6 +102,20 @@ git clone https://github.com/OEvortex/ddg_search.git
 cd ddg_search
 npm install
 npm start
+```
+
+Or with Yarn:
+
+```bash
+yarn install
+yarn start
+```
+
+Or with pnpm:
+
+```bash
+pnpm install
+pnpm start
 ```
 
 </details>
@@ -140,34 +182,15 @@ Or if installed globally:
     <i>Example: Search the web for "climate change solutions"</i>
   </div>
   <div style="margin-bottom: 1.5em;">
-    <b>🧠 Felo AI Search Tool</b><br/>
-    <code>felo-search</code><br/>
+    <b>🧠 IAsk AI Search Tool</b><br/>
+    <code>iask-search</code><br/>
     <ul>
-      <li><b>query</b> (string, required): The search query or prompt</li>
+      <li><b>query</b> (string, required): The search query or question</li>
+      <li><b>mode</b> (string, optional, default: "question"): Search mode - "question", "academic", "forums", "wiki", or "thinking"</li>
+      <li><b>detailLevel</b> (string, optional): Response detail level - "concise", "detailed", or "comprehensive"</li>
       <li><b>stream</b> (boolean, optional, default: false): Whether to stream the response</li>
     </ul>
-    <i>Example: Search Felo AI for "Explain quantum computing in simple terms"</i>
-  </div>
-  <div style="margin-bottom: 1.5em;">
-    <b>📄 Fetch URL Tool</b><br/>
-    <code>fetch-url</code><br/>
-    <ul>
-      <li><b>url</b> (string, required): The URL to fetch</li>
-      <li><b>maxLength</b> (integer, optional, default: 10000): Max content length</li>
-      <li><b>extractMainContent</b> (boolean, optional, default: true): Extract main content</li>
-      <li><b>includeLinks</b> (boolean, optional, default: true): Include link text</li>
-      <li><b>includeImages</b> (boolean, optional, default: true): Include image alt text</li>
-      <li><b>excludeTags</b> (array, optional): Tags to exclude</li>
-    </ul>
-    <i>Example: Fetch the content from "https://example.com"</i>
-  </div>
-  <div style="margin-bottom: 1.5em;">
-    <b>📊 URL Metadata Tool</b><br/>
-    <code>url-metadata</code><br/>
-    <ul>
-      <li><b>url</b> (string, required): The URL to extract metadata from</li>
-    </ul>
-    <i>Example: Get metadata for "https://example.com"</i>
+    <i>Example: Search IAsk AI for "Explain quantum computing in simple terms"</i>
   </div>
 </div>
 
@@ -182,12 +205,10 @@ src/
   index.js        # Main entry point
   tools/          # Tool definitions and handlers
     searchTool.js
-    fetchUrlTool.js
-    metadataTool.js
-    feloTool.js
+    iaskTool.js
   utils/
     search.js     # Search and URL utilities
-    search_felo.js # Felo AI search utilities
+    search_iask.js # IAsk AI search utilities
 package.json
 README.md
 ```
