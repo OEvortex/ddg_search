@@ -24,11 +24,6 @@ export const iaskToolDefinition = {
         type: 'string',
         description: 'Level of detail in the response. Options: "concise" (brief), "detailed" (moderate), "comprehensive" (extensive). Default is null (standard response).',
         enum: VALID_DETAIL_LEVELS
-      },
-      stream: {
-        type: 'boolean',
-        description: 'Enable streaming mode to receive incremental results. Default is false.',
-        default: false
       }
     },
     required: ['query']
@@ -47,45 +42,23 @@ export const iaskToolDefinition = {
 export async function iaskToolHandler(params) {
   const { 
     query, 
-    mode = 'question', 
-    detailLevel = null, 
-    stream = false 
+    mode = 'thinking', 
+    detailLevel = null
   } = params;
   
-  console.log(`Searching IAsk AI for: "${query}" (mode: ${mode}, detailLevel: ${detailLevel || 'default'}, stream: ${stream})`);
+  console.log(`Searching IAsk AI for: "${query}" (mode: ${mode}, detailLevel: ${detailLevel || 'default'})`);
   
   try {
-    if (stream) {
-      // For streaming responses, collect them and return
-      let fullResponse = '';
-      const chunks = [];
-      
-      for await (const chunk of await searchIAsk(query, true, false, mode, detailLevel)) {
-        chunks.push(chunk);
-        fullResponse += chunk;
-      }
-      
-      return {
-        content: [
-          {
-            type: 'text',
-            text: fullResponse || 'No results found.'
-          }
-        ]
-      };
-    } else {
-      // For non-streaming responses
-      const response = await searchIAsk(query, false, false, mode, detailLevel);
-      
-      return {
-        content: [
-          {
-            type: 'text',
-            text: response || 'No results found.'
-          }
-        ]
-      };
-    }
+    const response = await searchIAsk(query, mode, detailLevel);
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: response || 'No results found.'
+        }
+      ]
+    };
   } catch (error) {
     console.error(`Error in IAsk search: ${error.message}`);
     return {

@@ -8,10 +8,10 @@
   <a href="https://youtube.com/@OEvortex">
     <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
   </a>
-  <h1>DuckDuckGo & IAsk AI Search MCP <span style="font-size:2.2rem;">🔍🧠</span></h1>
+  <h1>DuckDuckGo, IAsk AI & Monica Search MCP <span style="font-size:2.2rem;">🔍🧠</span></h1>
   <p style="font-size:1.15rem; max-width:600px; margin:0 auto;">
     <strong>Lightning-fast, privacy-first Model Context Protocol (MCP) server for web search and AI-powered answers.<br>
-    Powered by DuckDuckGo and IAsk AI.</strong>
+    Powered by DuckDuckGo, IAsk AI and Monica.</strong>
   </p>
   <a href="https://glama.ai/mcp/servers/@OEvortex/ddg_search">
     <img width="380" height="200" src="https://glama.ai/mcp/servers/@OEvortex/ddg_search/badge" alt="DuckDuckGo Search MCP server" />
@@ -30,7 +30,7 @@
 ## ✨ Features
 
 <div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">  <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
-  <div><b>🧠 AI search</b> using IAsk AI</div>
+  <div><b>🧠 AI search</b> using IAsk AI & Monica</div>
   <div><b>⚡ Performance optimized</b> with caching</div>
   <div><b>🛡️ Security features</b> including rate limiting and rotating user agents</div>
   <div><b>🔌 MCP-compliant</b> server implementation</div>
@@ -200,9 +200,16 @@ Or if installed globally:
       <li><b>query</b> (string, required): The search query or question</li>
       <li><b>mode</b> (string, optional, default: "question"): Search mode - "question", "academic", "forums", "wiki", or "thinking"</li>
       <li><b>detailLevel</b> (string, optional): Response detail level - "concise", "detailed", or "comprehensive"</li>
-      <li><b>stream</b> (boolean, optional, default: false): Whether to stream the response</li>
     </ul>
     <i>Example: Search IAsk AI for "Explain quantum computing in simple terms"</i>
+  </div>
+  <div style="margin-bottom: 1.5em;">
+    <b>🤖 Monica AI Search Tool</b><br/>
+    <code>monica-search</code><br/>
+    <ul>
+      <li><b>query</b> (string, required): The search query or question</li>
+    </ul>
+    <i>Example: Search Monica AI for "Latest advancements in AI"</i>
   </div>
 </div>
 
@@ -218,8 +225,11 @@ src/
   tools/          # Tool definitions and handlers
     searchTool.js
     iaskTool.js
+    monicaTool.js
   utils/
     search.js     # Search and URL utilities
+    user_agents.js
+    search_monica.js
     search_iask.js # IAsk AI search utilities
 package.json
 README.md

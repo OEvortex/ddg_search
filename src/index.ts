@@ -4,6 +4,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 // Import tool definitions and handlers
 import { searchToolDefinition, searchToolHandler } from './tools/searchTool.js';
 import { iaskToolDefinition, iaskToolHandler } from './tools/iaskTool.js';
+import { monicaToolDefinition, monicaToolHandler } from './tools/monicaTool.js';
 
 // Required: Export default createServer function for Smithery
 export default function createServer({ config }: { config?: any } = {}) {
@@ -12,7 +13,8 @@ export default function createServer({ config }: { config?: any } = {}) {
   // Global variable to track available tools
   const availableTools = [
     searchToolDefinition,
-    iaskToolDefinition
+    iaskToolDefinition,
+    monicaToolDefinition
   ];
   
   console.log('Available tools:', availableTools.map(t => t.name));
@@ -50,6 +52,9 @@ export default function createServer({ config }: { config?: any } = {}) {
 
         case 'iask-search':
           return await iaskToolHandler(args);
+
+        case 'monica-search':
+          return await monicaToolHandler(args);
 
         default:
           throw new Error(`Tool not found: ${name}`);

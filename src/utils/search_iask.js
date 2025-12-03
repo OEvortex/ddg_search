@@ -4,6 +4,7 @@ import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import * as tough from 'tough-cookie';
 import { wrapper } from 'axios-cookiejar-support';
+import { getRandomUserAgent } from './user_agents.js';
 
 const { CookieJar } = tough;
 
@@ -109,13 +110,11 @@ function formatHtml(htmlContent) {
 /**
  * Search using IAsk AI via WebSocket (Phoenix LiveView)
  * @param {string} prompt - The search query or prompt
- * @param {boolean} stream - If true, returns async generator for streaming
- * @param {boolean} raw - If true, returns raw response (not used currently)
  * @param {string} mode - Search mode: 'question', 'academic', 'forums', 'wiki', 'thinking'
  * @param {string|null} detailLevel - Detail level: 'concise', 'detailed', 'comprehensive'
- * @returns {Promise<string|AsyncGenerator<string>>} The search results
+ * @returns {Promise<string>} The search results
  */
-async function searchIAsk(prompt, stream = false, raw = false, mode = 'question', detailLevel = null) {
+async function searchIAsk(prompt, mode = 'thinking', detailLevel = null) {
   // Validate mode
   if (!VALID_MODES.includes(mode)) {
     throw new Error(`Invalid mode: ${mode}. Valid modes are: ${VALID_MODES.join(', ')}`);
@@ -133,11 +132,7 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
   const cachedResults = resultsCache.get(cacheKey);
 
   if (cachedResults && Date.now() - cachedResults.timestamp < CACHE_DURATION) {
-    const result = cachedResults.results;
-    if (stream) {
-      return (async function*() { yield result; })();
-    }
-    return result;
+    return cachedResults.results;
   }
 
   // Build URL parameters
@@ -155,7 +150,7 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
     params: Object.fromEntries(params),
     timeout: DEFAULT_TIMEOUT,
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      'User-Agent': getRandomUserAgent()
     }
   });
 
@@ -188,13 +183,12 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
     const ws = new WebSocket(wsUrl, {
       headers: {
         'Cookie': cookieString,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': getRandomUserAgent(),
         'Origin': 'https://iask.ai'
       }
     });
     
     let buffer = '';
-    const chunks = [];
     let timeoutId;
 
     ws.on('open', () => {
@@ -237,7 +231,6 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
               }
               
               buffer += formatted;
-              chunks.push(formatted);
             }
           } else {
             throw new Error('No diff.e');
@@ -253,7 +246,6 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
               formatted = cache;
             }
             buffer += formatted;
-            chunks.push(formatted);
             // Close after cache find
             ws.close();
             return;
@@ -276,15 +268,7 @@ async function searchIAsk(prompt, stream = false, raw = false, mode = 'question'
         });
       }
       
-      if (stream) {
-        resolve((async function*() {
-          for (const chunk of chunks) {
-            yield chunk;
-          }
-        })());
-      } else {
-        resolve(buffer || 'No results found.');
-      }
+      resolve(buffer || 'No results found.');
     });
 
     ws.on('error', (err) => {

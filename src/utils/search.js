@@ -1,18 +1,10 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import https from 'https';
+import { getRandomUserAgent } from './user_agents.js';
 
 // Constants
 const MAX_CACHE_PAGES = 5;
-
-// Rotating User Agents
-const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0.0.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2.1 Safari/605.1.15',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-];
 
 // Cache results to avoid repeated requests
 const resultsCache = new Map();
@@ -26,14 +18,6 @@ const httpsAgent = new https.Agent({
   // Provide fallback for certificate issues while maintaining security
   secureProtocol: 'TLSv1_2_method'
 });
-
-/**
- * Get a random user agent from the list
- * @returns {string} A random user agent string
- */
-function getRandomUserAgent() {
-  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-}
 
 /**
  * Generate a cache key for a search query
