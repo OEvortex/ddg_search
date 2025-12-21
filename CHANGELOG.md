@@ -1,13 +1,29 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [1.1.9] - 2025-12-21
-### Fixed
-- Fixed JSON parsing error in searchTool handler that caused "invalid character 'S' looking for beginning of value" 
-- Removed JSON.stringify approach and implemented formatted text output for web search results
-- Improved result formatting to display numbered items, titles, URLs, snippets, and content consistently
+## [1.2.0] - 2025-12-21
+### Added
+- Comprehensive Jest testing framework with ES module support
+- Complete unit test suite for all utility functions (search, user_agents, search_iask, search_monica)
+- Integration tests for MCP server functionality and tool routing
+- Test infrastructure with mocking for all external dependencies
+- Input validation across all search modules and tools
+- Enhanced error handling with specific network error types
+- Performance optimizations with timeout management and caching
+- Improved logging and monitoring capabilities
+- Fixed JSON parsing error in searchTool handler (1.1.9 regression)
+- Updated package.json with comprehensive test scripts
+- Added Babel configuration for test compatibility
 
-## [1.1.8] - 2025-12-03
+### Improved
+- Search module robustness with AbortController and timeout management
+- IAsk AI WebSocket connection handling with enhanced error reporting
+- Monica AI stream processing with improved validation
+- Tool schema validation with comprehensive parameter checking
+- User agent rotation consistency and logging
+- Cache management with hit detection and size controls
+
+## [1.1.9] - 2025-12-21
 ### Added
 - Added new `getRandomUserAgent` function to rotate user agents
 - Added new `src/utils/user_agents.js` file containing list of user agents
