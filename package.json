@@ -15,7 +15,13 @@
     "oevortex-ddg-search": "bin/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern=src/__tests__/utils",
+    "test:integration": "jest --testPathPattern=src/__tests__/mcp-integration",
+    "test:tools": "jest --testPathPattern=src/__tests__/tools",
+    "test:all": "jest --coverage --verbose",
     "start": "node bin/cli.js",
     "prepublishOnly": "npm run lint",
     "lint": "echo \"No linting configured\"",
@@ -51,7 +57,12 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@jest/globals": "^29.7.0",
     "@types/node": "^24.3.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
     "tsx": "^4.20.4",
     "typescript": "^5.9.2"
   }

@@ -5,16 +5,17 @@ import { getRandomUserAgent } from './user_agents.js';
 
 // Constants
 const MAX_CACHE_PAGES = 5;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const REQUEST_TIMEOUT = 10000; // 10 seconds
 
 // Cache results to avoid repeated requests
 const resultsCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // HTTPS agent configuration to handle certificate chain issues
 const httpsAgent = new https.Agent({
   rejectUnauthorized: true, // Keep security enabled
   keepAlive: true,
-  timeout: 10000,
+  timeout: REQUEST_TIMEOUT,
   // Provide fallback for certificate issues while maintaining security
   secureProtocol: 'TLSv1_2_method'
 });
@@ -107,150 +108,6 @@ function getFaviconUrl(url) {
   }
 }
 
-
-/**
- * Scrapes search results from DuckDuckGo HTML
- * @param {string} query - The search query
- * @param {number} numResults - Number of results to return (default: 10)
- * @returns {Promise<Array>} - Array of search results
- */
-async function searchDuckDuckGo(query, numResults = 10, mode = 'short') {
-  try {
-    // Clear old cache entries
-    clearOldCache();
-
-    // Check cache first
-    const cacheKey = getCacheKey(query);
-    const cachedResults = resultsCache.get(cacheKey);
-
-    if (cachedResults && Date.now() - cachedResults.timestamp < CACHE_DURATION) {
-      return cachedResults.results.slice(0, numResults);
-    }
-
-    // Get a random user agent
-    const userAgent = getRandomUserAgent();
-
-    // Fetch results
-    const response = await axios.get(
-      `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          'User-Agent': userAgent
-        },
-        httpsAgent: httpsAgent
-      }
-    );
-
-    if (response.status !== 200) {
-      throw new Error('Failed to fetch search results');
-    }
-
-    const html = response.data;
-
-    // Parse results using cheerio
-    const $ = cheerio.load(html);
-
-    const results = [];
-    const jinaFetchPromises = [];
-    $('.result').each((i, result) => {
-      const $result = $(result);
-      const titleEl = $result.find('.result__title a');
-      const linkEl = $result.find('.result__url');
-      const snippetEl = $result.find('.result__snippet');
-
-      const title = titleEl.text()?.trim();
-      const rawLink = titleEl.attr('href');
-      const description = snippetEl.text()?.trim();
-      const displayUrl = linkEl.text()?.trim();
-
-      const directLink = extractDirectUrl(rawLink || '');
-      const favicon = getFaviconUrl(directLink);
-      const jinaUrl = getJinaAiUrl(directLink);
-
-      if (title && directLink) {
-        if (mode === 'detailed') {
-          jinaFetchPromises.push(
-            axios.get(jinaUrl, {
-              headers: {
-                'User-Agent': getRandomUserAgent()
-              },
-              httpsAgent: httpsAgent,
-              timeout: 10000
-            })
-            .then(jinaRes => {
-              let jinaContent = '';
-              if (jinaRes.status === 200 && typeof jinaRes.data === 'string') {
-                const $jina = cheerio.load(jinaRes.data);
-                jinaContent = $jina('body').text()
-              }
-              return {
-                title,
-                url: directLink,
-                snippet: description || '',
-                favicon: favicon,
-                displayUrl: displayUrl || '',
-                Description: jinaContent
-              };
-            })
-            .catch(() => {
-              return {
-                title,
-                url: directLink,
-                snippet: description || '',
-                favicon: favicon,
-                displayUrl: displayUrl || '',
-                Description: ''
-              };
-            })
-          );
-        } else {
-          // short mode: omit Description
-          jinaFetchPromises.push(
-            Promise.resolve({
-              title,
-              url: directLink,
-              snippet: description || '',
-              favicon: favicon,
-              displayUrl: displayUrl || ''
-            })
-          );
-        }
-      }
-    });
-
-    // Wait for all Jina AI fetches to complete
-    const jinaResults = await Promise.all(jinaFetchPromises);
-    results.push(...jinaResults);
-
-    // Get limited results
-    const limitedResults = results.slice(0, numResults);
-
-    // Cache the results
-    resultsCache.set(cacheKey, {
-      results: limitedResults,
-      timestamp: Date.now()
-    });
-
-    // If cache is too big, remove oldest entries
-    if (resultsCache.size > MAX_CACHE_PAGES) {
-      const oldestKey = Array.from(resultsCache.keys())[0];
-      resultsCache.delete(oldestKey);
-    }
-
-    return limitedResults;
-  } catch (error) {
-    console.error('Error searching DuckDuckGo:', error.message);
-    throw error;
-  }
-}
-
-
-export {
-  searchDuckDuckGo,
-  extractDirectUrl,
-  getFaviconUrl
-};
-
 /**
  * Generate a Jina AI URL for a given website URL
  * @param {string} url - The website URL
@@ -265,4 +122,202 @@ function getJinaAiUrl(url) {
   }
 }
 
-export { getJinaAiUrl };
+/**
+ * Scrapes search results from DuckDuckGo HTML
+ * @param {string} query - The search query
+ * @param {number} numResults - Number of results to return (default: 10)
+ * @param {string} mode - 'short' or 'detailed' mode (default: 'short')
+ * @returns {Promise<Array>} - Array of search results
+ */
+async function searchDuckDuckGo(query, numResults = 10, mode = 'short') {
+  try {
+    // Input validation
+    if (!query || typeof query !== 'string') {
+      throw new Error('Invalid query: query must be a non-empty string');
+    }
+    
+    if (!Number.isInteger(numResults) || numResults < 1 || numResults > 20) {
+      throw new Error('Invalid numResults: must be an integer between 1 and 20');
+    }
+    
+    if (!['short', 'detailed'].includes(mode)) {
+      throw new Error('Invalid mode: must be "short" or "detailed"');
+    }
+
+    // Clear old cache entries
+    clearOldCache();
+
+    // Check cache first
+    const cacheKey = getCacheKey(query);
+    const cachedResults = resultsCache.get(cacheKey);
+
+    if (cachedResults && Date.now() - cachedResults.timestamp < CACHE_DURATION) {
+      console.log(`Cache hit for query: "${query}"`);
+      return cachedResults.results.slice(0, numResults);
+    }
+
+    // Get a random user agent
+    const userAgent = getRandomUserAgent();
+
+    console.log(`Searching DuckDuckGo for: "${query}" (${numResults} results, mode: ${mode})`);
+
+    // Fetch results with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      const response = await axios.get(
+        `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`,
+        {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': userAgent
+          },
+          httpsAgent: httpsAgent,
+          timeout: REQUEST_TIMEOUT
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP ${response.status}: Failed to fetch search results`);
+      }
+
+      const html = response.data;
+
+      // Parse results using cheerio
+      const $ = cheerio.load(html);
+
+      const results = [];
+      const jinaFetchPromises = [];
+
+      $('.result').each((i, result) => {
+        const $result = $(result);
+        const titleEl = $result.find('.result__title a');
+        const linkEl = $result.find('.result__url');
+        const snippetEl = $result.find('.result__snippet');
+
+        const title = titleEl.text()?.trim();
+        const rawLink = titleEl.attr('href');
+        const description = snippetEl.text()?.trim();
+        const displayUrl = linkEl.text()?.trim();
+
+        const directLink = extractDirectUrl(rawLink || '');
+        const favicon = getFaviconUrl(directLink);
+        const jinaUrl = getJinaAiUrl(directLink);
+
+        if (title && directLink) {
+          if (mode === 'detailed') {
+            jinaFetchPromises.push(
+              axios.get(jinaUrl, {
+                headers: {
+                  'User-Agent': getRandomUserAgent()
+                },
+                httpsAgent: httpsAgent,
+                timeout: 8000
+              })
+                .then(jinaRes => {
+                  let jinaContent = '';
+                  if (jinaRes.status === 200 && typeof jinaRes.data === 'string') {
+                    const $jina = cheerio.load(jinaRes.data);
+                    jinaContent = $jina('body').text();
+                  }
+                  return {
+                    title,
+                    url: directLink,
+                    snippet: description || '',
+                    favicon: favicon,
+                    displayUrl: displayUrl || '',
+                    description: jinaContent
+                  };
+                })
+                .catch(() => {
+                  // Return fallback without content
+                  return {
+                    title,
+                    url: directLink,
+                    snippet: description || '',
+                    favicon: favicon,
+                    displayUrl: displayUrl || '',
+                    description: ''
+                  };
+                })
+            );
+          } else {
+            // short mode: omit description
+            jinaFetchPromises.push(
+              Promise.resolve({
+                title,
+                url: directLink,
+                snippet: description || '',
+                favicon: favicon,
+                displayUrl: displayUrl || ''
+              })
+            );
+          }
+        }
+      });
+
+      // Wait for all Jina AI fetches to complete with timeout
+      const jinaResults = await Promise.race([
+        Promise.all(jinaFetchPromises),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Content fetch timeout')), 15000)
+        )
+      ]);
+
+      results.push(...jinaResults);
+
+      // Get limited results
+      const limitedResults = results.slice(0, numResults);
+
+      // Cache the results
+      resultsCache.set(cacheKey, {
+        results: limitedResults,
+        timestamp: Date.now()
+      });
+
+      // If cache is too big, remove oldest entries
+      if (resultsCache.size > MAX_CACHE_PAGES) {
+        const oldestKey = Array.from(resultsCache.keys())[0];
+        resultsCache.delete(oldestKey);
+      }
+
+      console.log(`Found ${limitedResults.length} results for query: "${query}"`);
+      return limitedResults;
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Search request timeout: took longer than 10 seconds');
+      }
+      
+      if (fetchError.code === 'ENOTFOUND') {
+        throw new Error('Network error: unable to resolve host');
+      }
+      
+      if (fetchError.code === 'ECONNREFUSED') {
+        throw new Error('Network error: connection refused');
+      }
+      
+      throw fetchError;
+    }
+  } catch (error) {
+    console.error('Error searching DuckDuckGo:', error.message);
+    
+    // Enhanced error reporting
+    if (error.message.includes('Invalid')) {
+      throw error; // Re-throw validation errors as-is
+    }
+    
+    throw new Error(`Search failed for "${query}": ${error.message}`);
+  }
+}
+
+export {
+  searchDuckDuckGo,
+  extractDirectUrl,
+  getFaviconUrl,
+  getJinaAiUrl
+};

@@ -115,6 +115,11 @@ function formatHtml(htmlContent) {
  * @returns {Promise<string>} The search results
  */
 async function searchIAsk(prompt, mode = 'thinking', detailLevel = null) {
+  // Input validation
+  if (!prompt || typeof prompt !== 'string') {
+    throw new Error('Invalid prompt: prompt must be a non-empty string');
+  }
+
   // Validate mode
   if (!VALID_MODES.includes(mode)) {
     throw new Error(`Invalid mode: ${mode}. Valid modes are: ${VALID_MODES.join(', ')}`);
@@ -125,6 +130,8 @@ async function searchIAsk(prompt, mode = 'thinking', detailLevel = null) {
     throw new Error(`Invalid detail level: ${detailLevel}. Valid levels are: ${VALID_DETAIL_LEVELS.join(', ')}`);
   }
 
+  console.log(`IAsk search starting: "${prompt}" (mode: ${mode}, detailLevel: ${detailLevel || 'default'})`);
+
   // Clear old cache entries
   clearOldCache();
 
@@ -132,6 +139,7 @@ async function searchIAsk(prompt, mode = 'thinking', detailLevel = null) {
   const cachedResults = resultsCache.get(cacheKey);
 
   if (cachedResults && Date.now() - cachedResults.timestamp < CACHE_DURATION) {
+    console.log(`Cache hit for IAsk query: "${prompt}"`);
     return cachedResults.results;
   }
 
@@ -145,141 +153,187 @@ async function searchIAsk(prompt, mode = 'thinking', detailLevel = null) {
   const jar = new CookieJar();
   const client = wrapper(axios.create({ jar }));
 
-  // Get initial page and extract tokens
-  const response = await client.get(API_ENDPOINT, {
-    params: Object.fromEntries(params),
-    timeout: DEFAULT_TIMEOUT,
-    headers: {
-      'User-Agent': getRandomUserAgent()
-    }
-  });
-
-  const $ = cheerio.load(response.data);
-  
-  const phxNode = $('[id^="phx-"]').first();
-  const csrfToken = $('[name="csrf-token"]').attr('content');
-  const phxId = phxNode.attr('id');
-  const phxSession = phxNode.attr('data-phx-session');
-
-  if (!phxId || !csrfToken) {
-    throw new Error('Failed to extract required tokens from page');
-  }
-
-  // Get the actual response URL (after any redirects)
-  const responseUrl = response.request.res?.responseUrl || response.config.url;
-  
-  // Get cookies from the jar for WebSocket connection
-  const cookies = await jar.getCookies(API_ENDPOINT);
-  const cookieString = cookies.map(c => `${c.key}=${c.value}`).join('; ');
-  
-  // Build WebSocket URL
-  const wsParams = new URLSearchParams({
-    '_csrf_token': csrfToken,
-    'vsn': '2.0.0'
-  });
-  const wsUrl = `wss://iask.ai/live/websocket?${wsParams.toString()}`;
-
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(wsUrl, {
+  try {
+    // Get initial page and extract tokens
+    console.log('Fetching IAsk AI initial page...');
+    const response = await client.get(API_ENDPOINT, {
+      params: Object.fromEntries(params),
+      timeout: DEFAULT_TIMEOUT,
       headers: {
-        'Cookie': cookieString,
-        'User-Agent': getRandomUserAgent(),
-        'Origin': 'https://iask.ai'
+        'User-Agent': getRandomUserAgent()
       }
     });
+
+    const $ = cheerio.load(response.data);
     
-    let buffer = '';
-    let timeoutId;
+    const phxNode = $('[id^="phx-"]').first();
+    const csrfToken = $('[name="csrf-token"]').attr('content');
+    const phxId = phxNode.attr('id');
+    const phxSession = phxNode.attr('data-phx-session');
 
-    ws.on('open', () => {
-      // Send phx_join message
-      ws.send(JSON.stringify([
-        null,
-        null,
-        `lv:${phxId}`,
-        'phx_join',
-        {
-          params: { _csrf_token: csrfToken },
-          url: responseUrl,
-          session: phxSession
-        }
-      ]));
+    if (!phxId || !csrfToken) {
+      throw new Error('Failed to extract required tokens from IAsk AI page');
+    }
+
+    // Get the actual response URL (after any redirects)
+    const responseUrl = response.request.res?.responseUrl || response.config.url;
+    
+    // Get cookies from the jar for WebSocket connection
+    const cookies = await jar.getCookies(API_ENDPOINT);
+    const cookieString = cookies.map(c => `${c.key}=${c.value}`).join('; ');
+    
+    // Build WebSocket URL
+    const wsParams = new URLSearchParams({
+      '_csrf_token': csrfToken,
+      'vsn': '2.0.0'
     });
+    const wsUrl = `wss://iask.ai/live/websocket?${wsParams.toString()}`;
 
-    ws.on('message', (data) => {
-      try {
-        const msg = JSON.parse(data.toString());
-        if (!msg) return;
-
-        const diff = msg[4];
-        if (!diff) return;
-
-        let chunk = null;
-
-        try {
-          // Try to get chunk from diff.e[0][1].data
-          // Use non-optional chaining to trigger exception if path doesn't exist
-          if (diff.e) {
-            chunk = diff.e[0][1].data;
-            
-            if (chunk) {
-              let formatted;
-              if (/<[^>]+>/.test(chunk)) {
-                formatted = formatHtml(chunk);
-              } else {
-                formatted = chunk.replace(/<br\/>/g, '\n');
-              }
-              
-              buffer += formatted;
-            }
-          } else {
-            throw new Error('No diff.e');
-          }
-        } catch {
-          // Fallback to cacheFind
-          const cache = cacheFind(diff);
-          if (cache) {
-            let formatted;
-            if (/<[^>]+>/.test(cache)) {
-              formatted = formatHtml(cache);
-            } else {
-              formatted = cache;
-            }
-            buffer += formatted;
-            // Close after cache find
-            ws.close();
-            return;
-          }
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(wsUrl, {
+        headers: {
+          'Cookie': cookieString,
+          'User-Agent': getRandomUserAgent(),
+          'Origin': 'https://iask.ai'
         }
-      } catch (err) {
-        reject(new Error(`IAsk API error: ${err.message}`));
+      });
+      
+      let buffer = '';
+      let timeoutId;
+      let connectionTimeoutId;
+
+      // Set connection timeout
+      connectionTimeoutId = setTimeout(() => {
         ws.close();
-      }
-    });
+        reject(new Error('IAsk connection timeout: unable to establish WebSocket connection'));
+      }, 15000);
 
-    ws.on('close', () => {
-      clearTimeout(timeoutId);
-      
-      // Cache the result
-      if (buffer) {
-        resultsCache.set(cacheKey, {
-          results: buffer,
-          timestamp: Date.now()
-        });
-      }
-      
-      resolve(buffer || 'No results found.');
-    });
+      ws.on('open', () => {
+        clearTimeout(connectionTimeoutId);
+        console.log('IAsk WebSocket connection established');
+        
+        // Send phx_join message
+        ws.send(JSON.stringify([
+          null,
+          null,
+          `lv:${phxId}`,
+          'phx_join',
+          {
+            params: { _csrf_token: csrfToken },
+            url: responseUrl,
+            session: phxSession
+          }
+        ]));
 
-    ws.on('error', (err) => {
-      clearTimeout(timeoutId);
-      reject(new Error(`WebSocket error: ${err.message}`));
-    });
+        // Set message timeout
+        timeoutId = setTimeout(() => {
+          ws.close();
+          if (buffer) {
+            resolve(buffer || 'No results found.');
+          } else {
+            reject(new Error('IAsk response timeout: no response received'));
+          }
+        }, DEFAULT_TIMEOUT);
+      });
 
-    timeoutId = setTimeout(() => {
-      ws.close();
-    }, DEFAULT_TIMEOUT);
-  });
+      ws.on('message', (data) => {
+        try {
+          const msg = JSON.parse(data.toString());
+          if (!msg) return;
+
+          const diff = msg[4];
+          if (!diff) return;
+
+          let chunk = null;
+
+          try {
+            // Try to get chunk from diff.e[0][1].data
+            if (diff.e) {
+              chunk = diff.e[0][1].data;
+              
+              if (chunk) {
+                let formatted;
+                if (/<[^>]+>/.test(chunk)) {
+                  formatted = formatHtml(chunk);
+                } else {
+                  formatted = chunk.replace(/<br\/>/g, '\n');
+                }
+                
+                buffer += formatted;
+              }
+            } else {
+              throw new Error('No diff.e');
+            }
+          } catch {
+            // Fallback to cacheFind
+            const cache = cacheFind(diff);
+            if (cache) {
+              let formatted;
+              if (/<[^>]+>/.test(cache)) {
+                formatted = formatHtml(cache);
+              } else {
+                formatted = cache;
+              }
+              buffer += formatted;
+              // Close after cache find
+              ws.close();
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing IAsk message:', err.message);
+        }
+      });
+
+      ws.on('close', () => {
+        clearTimeout(timeoutId);
+        clearTimeout(connectionTimeoutId);
+        
+        console.log(`IAsk search completed: ${buffer.length} characters received`);
+        
+        // Cache the result
+        if (buffer) {
+          resultsCache.set(cacheKey, {
+            results: buffer,
+            timestamp: Date.now()
+          });
+        }
+        
+        resolve(buffer || 'No results found.');
+      });
+
+      ws.on('error', (err) => {
+        clearTimeout(timeoutId);
+        clearTimeout(connectionTimeoutId);
+        console.error('IAsk WebSocket error:', err.message);
+        
+        if (err.message.includes('timeout')) {
+          reject(new Error('IAsk WebSocket timeout: connection took too long'));
+        } else if (err.message.includes('connection refused')) {
+          reject(new Error('IAsk connection refused: service may be unavailable'));
+        } else {
+          reject(new Error(`IAsk WebSocket error: ${err.message}`));
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error in IAsk search:', error.message);
+    
+    // Enhanced error handling
+    if (error.code === 'ENOTFOUND') {
+      throw new Error('IAsk network error: unable to resolve host');
+    }
+    
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error('IAsk network error: connection refused');
+    }
+    
+    if (error.message.includes('timeout')) {
+      throw new Error(`IAsk timeout: ${error.message}`);
+    }
+    
+    throw new Error(`IAsk search failed for "${prompt}": ${error.message}`);
+  }
 }
 
 export { searchIAsk, VALID_MODES, VALID_DETAIL_LEVELS };
