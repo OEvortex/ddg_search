@@ -44,11 +44,35 @@ export async function searchToolHandler(params) {
   const results = await searchDuckDuckGo(query, numResults, mode);
   console.log(`Found ${results.length} results`);
 
+  // Format results as readable text, similar to other search tools
+  const formattedResults = results.map((result, index) => {
+    let formatted = `${index + 1}. **${result.title}**\n`;
+    formatted += `URL: ${result.url}\n`;
+    
+    if (result.displayUrl) {
+      formatted += `Display URL: ${result.displayUrl}\n`;
+    }
+    
+    if (result.snippet) {
+      formatted += `Snippet: ${result.snippet}\n`;
+    }
+    
+    if (mode === 'detailed' && result.description) {
+      formatted += `Content: ${result.description}\n`;
+    }
+    
+    if (result.favicon) {
+      formatted += `Favicon: ${result.favicon}\n`;
+    }
+    
+    return formatted;
+  }).join('\n');
+
   return {
     content: [
       {
         type: 'text',
-        text: JSON.stringify(results)
+        text: formattedResults || 'No results found.'
       }
     ]
   };

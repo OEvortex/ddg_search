@@ -1,6 +1,12 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.1.9] - 2025-12-21
+### Fixed
+- Fixed JSON parsing error in searchTool handler that caused "invalid character 'S' looking for beginning of value" 
+- Removed JSON.stringify approach and implemented formatted text output for web search results
+- Improved result formatting to display numbered items, titles, URLs, snippets, and content consistently
+
 ## [1.1.8] - 2025-12-03
 ### Added
 - Added new `getRandomUserAgent` function to rotate user agents
