@@ -1,6 +1,6 @@
 {
   "name": "@oevortex/ddg_search",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A Model Context Protocol server for web search using DuckDuckGo and IAsk AI",
   "main": "src/index.js",
   "module": "src/index.ts",

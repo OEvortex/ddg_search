@@ -101,6 +101,11 @@ describe('MCP Server Integration', () => {
       const monicaTool = result.tools.find(tool => tool.name === 'monica-search');
       expect(monicaTool).toBeDefined();
       expect(monicaTool.inputSchema).toBeDefined();
+
+      // Should have brave-search tool
+      const braveTool = result.tools.find(tool => tool.name === 'brave-search');
+      expect(braveTool).toBeDefined();
+      expect(braveTool.inputSchema).toBeDefined();
     });
   });
 
@@ -158,6 +163,21 @@ describe('MCP Server Integration', () => {
       
       // Test would verify routing to Monica tool
       expect(mockRequest.params.name).toBe('monica-search');
+    });
+
+    test('should route brave-search tool calls correctly', async () => {
+      const mockRequest = {
+        params: {
+          name: 'brave-search',
+          arguments: {
+            query: 'test brave query',
+            enableResearch: true
+          }
+        }
+      };
+
+      // Test would verify routing to Brave tool
+      expect(mockRequest.params.name).toBe('brave-search');
     });
 
     test('should handle unknown tool calls', async () => {

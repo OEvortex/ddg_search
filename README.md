@@ -8,10 +8,10 @@
   <a href="https://youtube.com/@OEvortex">
     <img src="https://img.shields.io/badge/YouTube-%40OEvortex-red.svg" alt="YouTube Channel" />
   </a>
-  <h1>DuckDuckGo, IAsk AI & Monica Search MCP <span style="font-size:2.2rem;">🔍🧠</span></h1>
+  <h1>DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP <span style="font-size:2.2rem;">🔍🧠</span></h1>
   <p style="font-size:1.15rem; max-width:600px; margin:0 auto;">
     <strong>Lightning-fast, privacy-first Model Context Protocol (MCP) server for web search and AI-powered answers.<br>
-    Powered by DuckDuckGo, IAsk AI and Monica.</strong>
+    Powered by DuckDuckGo, IAsk AI, Monica, and Brave AI.</strong>
   </p>
   <a href="https://glama.ai/mcp/servers/@OEvortex/ddg_search">
     <img width="380" height="200" src="https://glama.ai/mcp/servers/@OEvortex/ddg_search/badge" alt="DuckDuckGo Search MCP server" />
@@ -30,7 +30,7 @@
 ## ✨ Features
 
 <div style="display: flex; flex-wrap: wrap; gap: 1.5em; margin-bottom: 1.5em;">  <div><b>🌐 Web search</b> using DuckDuckGo HTML</div>
-  <div><b>🧠 AI search</b> using IAsk AI & Monica</div>
+  <div><b>🧠 AI search</b> using IAsk AI, Monica & Brave AI</div>
   <div><b>⚡ Performance optimized</b> with caching</div>
   <div><b>🛡️ Security features</b> including rate limiting and rotating user agents</div>
   <div><b>🔌 MCP-compliant</b> server implementation</div>
@@ -211,6 +211,15 @@ Or if installed globally:
     </ul>
     <i>Example: Search Monica AI for "Latest advancements in AI"</i>
   </div>
+  <div style="margin-bottom: 1.5em;">
+    <b>🛡️ Brave AI Search Tool</b><br/>
+    <code>brave-search</code><br/>
+    <ul>
+      <li><b>query</b> (string, required): The search query or question</li>
+      <li><b>enableResearch</b> (boolean, optional, default: false): Enable deep research mode</li>
+    </ul>
+    <i>Example: Search Brave AI for "Summarize the latest AI safety research"</i>
+  </div>
 </div>
 
 ---
@@ -226,11 +235,13 @@ src/
     searchTool.js
     iaskTool.js
     monicaTool.js
+    braveTool.js
   utils/
     search.js     # Search and URL utilities
     user_agents.js
     search_monica.js
     search_iask.js # IAsk AI search utilities
+    search_brave_ai.js
 package.json
 README.md
 ```

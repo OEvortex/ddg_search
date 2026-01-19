@@ -14,12 +14,13 @@ async function startServer() {
     const { searchToolDefinition, searchToolHandler } = await import(`${modulePath}/tools/searchTool.js`);
     const { iaskToolDefinition, iaskToolHandler } = await import(`${modulePath}/tools/iaskTool.js`);
     const { monicaToolDefinition, monicaToolHandler } = await import(`${modulePath}/tools/monicaTool.js`);
+    const { braveToolDefinition, braveToolHandler } = await import(`${modulePath}/tools/braveTool.js`);
 
     // Create the MCP server
     const server = new Server({
       id: 'ddg-search-mcp',
-      name: 'DuckDuckGo, IAsk AI & Monica Search MCP',
-      description: 'A Model Context Protocol server for web search using DuckDuckGo, IAsk AI and Monica',
+      name: 'DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP',
+      description: 'A Model Context Protocol server for web search using DuckDuckGo, IAsk AI, Monica, and Brave AI',
       version: '1.1.8'
     }, {
       capabilities: {
@@ -33,7 +34,8 @@ async function startServer() {
     let availableTools = [
       searchToolDefinition,
       iaskToolDefinition,
-      monicaToolDefinition
+      monicaToolDefinition,
+      braveToolDefinition
     ];
 
     // Define available tools
@@ -56,7 +58,7 @@ async function startServer() {
         const { name, arguments: args } = request.params;
         
         // Validate tool name
-        const validTools = ['web-search', 'iask-search', 'monica-search'];
+        const validTools = ['web-search', 'iask-search', 'monica-search', 'brave-search'];
         if (!validTools.includes(name)) {
           throw new Error(`Unknown tool: ${name}`);
         }
@@ -71,6 +73,9 @@ async function startServer() {
 
           case 'monica-search':
             return await monicaToolHandler(args);
+
+          case 'brave-search':
+            return await braveToolHandler(args);
 
           default:
             throw new Error(`Tool not found: ${name}`);
@@ -92,7 +97,7 @@ async function startServer() {
     });    // Display promotional message
     console.error('\n\x1b[36m╔════════════════════════════════════════════════════════════╗');
     console.error('║                                                            ║');
-    console.error('║  \x1b[1m\x1b[31mDuckDuckGo & IAsk AI Search MCP\x1b[0m\x1b[36m by \x1b[1m\x1b[33m@OEvortex\x1b[0m\x1b[36m       ║');
+    console.error('║  \x1b[1m\x1b[31mDuckDuckGo & AI Search MCP\x1b[0m\x1b[36m by \x1b[1m\x1b[33m@OEvortex\x1b[0m\x1b[36m            ║');
     console.error('║                                                            ║');
     console.error('║  \x1b[0m👉 Subscribe to \x1b[1m\x1b[37myoutube.com/@OEvortex\x1b[0m\x1b[36m for more tools!  ║');
     console.error('║                                                            ║');
@@ -101,7 +106,7 @@ async function startServer() {
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error('DuckDuckGo, IAsk AI & Monica Search MCP server started and listening on stdio');
+    console.error('DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP server started and listening on stdio');
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
@@ -115,7 +120,7 @@ const versionFlag = args.includes('--version') || args.includes('-v');
 
 if (helpFlag) {
   console.log(`
-DuckDuckGo, IAsk AI & Monica Search MCP - A Model Context Protocol server for web search
+DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP - A Model Context Protocol server for web search
 
 Usage:
   npx -y @oevortex/ddg_search@latest [options]
@@ -128,6 +133,7 @@ This MCP server provides the following tools:
   - web-search: Search the web using DuckDuckGo
   - iask-search: Search using IAsk AI for AI-generated responses
   - monica-search: Search using Monica AI for AI-generated responses
+  - brave-search: Search using Brave AI for AI-generated responses
 
 Created by @OEvortex
 Subscribe to youtube.com/@OEvortex for more tools and tutorials!
@@ -145,7 +151,7 @@ if (versionFlag) {
         const packageJson = JSON.parse(
           await readFile(new URL('../package.json', import.meta.url), 'utf8')
         );
-        console.log(`DuckDuckGo & IAsk AI Search MCP v${packageJson.version}\nCreated by @OEvortex - Subscribe to youtube.com/@OEvortex!`);
+        console.log(`DuckDuckGo & AI Search MCP v${packageJson.version}\nCreated by @OEvortex - Subscribe to youtube.com/@OEvortex!`);
         process.exit(0);
       } catch (err) {
         console.error('Error reading version information:', err);

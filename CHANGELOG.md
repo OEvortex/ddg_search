@@ -1,6 +1,16 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.2.1] - 2026-01-19
+### Added
+- Brave AI Search provider and tool with research mode toggle
+- Brave AI search utility with streaming response parsing
+- Brave AI tool tests and MCP integration coverage
+- Updated CLI help text and README documentation for Brave AI
+
+### Changed
+- Server and CLI tool registry to include brave-search
+
 ## [1.2.0] - 2025-12-21
 ### Added
 - Comprehensive Jest testing framework with ES module support
