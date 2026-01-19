@@ -3,20 +3,18 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 
 // Import tool definitions and handlers
 import { searchToolDefinition, searchToolHandler } from './tools/searchTool.js';
-import { fetchUrlToolDefinition, fetchUrlToolHandler } from './tools/fetchUrlTool.js';
-import { metadataToolDefinition, metadataToolHandler } from './tools/metadataTool.js';
-import { feloToolDefinition, feloToolHandler } from './tools/feloTool.js';
+import { iaskToolDefinition, iaskToolHandler } from './tools/iaskTool.js';
+import { monicaToolDefinition, monicaToolHandler } from './tools/monicaTool.js';
 
 // Required: Export default createServer function for Smithery
 export default function createServer({ config }: { config?: any } = {}) {
   console.log('Creating MCP server with latest SDK...');
-  
+
   // Global variable to track available tools
   const availableTools = [
     searchToolDefinition,
-    fetchUrlToolDefinition,
-    metadataToolDefinition,
-    feloToolDefinition
+    iaskToolDefinition,
+    monicaToolDefinition
   ];
   
   console.log('Available tools:', availableTools.map(t => t.name));
@@ -51,16 +49,13 @@ export default function createServer({ config }: { config?: any } = {}) {
       switch (name) {
         case 'web-search':
           return await searchToolHandler(args);
-        
-        case 'fetch-url':
-          return await fetchUrlToolHandler(args);
-        
-        case 'url-metadata':
-          return await metadataToolHandler(args);
-        
-        case 'felo-search':
-          return await feloToolHandler(args);
-        
+
+        case 'iask-search':
+          return await iaskToolHandler(args);
+
+        case 'monica-search':
+          return await monicaToolHandler(args);
+
         default:
           throw new Error(`Tool not found: ${name}`);
       }
