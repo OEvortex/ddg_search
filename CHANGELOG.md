@@ -2,7 +2,7 @@
  
 All notable changes to this project will be documented in this file.
 
-## [1.3.0] - 2026-02-09
+## [1.2.2] - 2026-02-09
 
 ### Removed
 - Brave AI Search provider and tool
@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - Brave AI tool tests and MCP integration coverage
 
 ### Changed
-- Updated package.json version to 1.3.0
+- Updated package.json version to 1.2.2
 
 ## [1.2.1] - 2026-01-19
 ### Added
