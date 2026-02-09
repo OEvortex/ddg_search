@@ -14,13 +14,12 @@ async function startServer() {
     const { searchToolDefinition, searchToolHandler } = await import(`${modulePath}/tools/searchTool.js`);
     const { iaskToolDefinition, iaskToolHandler } = await import(`${modulePath}/tools/iaskTool.js`);
     const { monicaToolDefinition, monicaToolHandler } = await import(`${modulePath}/tools/monicaTool.js`);
-    const { braveToolDefinition, braveToolHandler } = await import(`${modulePath}/tools/braveTool.js`);
 
     // Create the MCP server
     const server = new Server({
       id: 'ddg-search-mcp',
-      name: 'DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP',
-      description: 'A Model Context Protocol server for web search using DuckDuckGo, IAsk AI, Monica, and Brave AI',
+      name: 'DuckDuckGo, IAsk AI & Monica AI Search MCP',
+      description: 'A Model Context Protocol server for web search using DuckDuckGo, IAsk AI, and Monica AI',
       version: '1.1.8'
     }, {
       capabilities: {
@@ -34,8 +33,7 @@ async function startServer() {
     let availableTools = [
       searchToolDefinition,
       iaskToolDefinition,
-      monicaToolDefinition,
-      braveToolDefinition
+      monicaToolDefinition
     ];
 
     // Define available tools
@@ -58,7 +56,7 @@ async function startServer() {
         const { name, arguments: args } = request.params;
         
         // Validate tool name
-        const validTools = ['web-search', 'iask-search', 'monica-search', 'brave-search'];
+        const validTools = ['web-search', 'iask-search', 'monica-search'];
         if (!validTools.includes(name)) {
           throw new Error(`Unknown tool: ${name}`);
         }
@@ -73,9 +71,6 @@ async function startServer() {
 
           case 'monica-search':
             return await monicaToolHandler(args);
-
-          case 'brave-search':
-            return await braveToolHandler(args);
 
           default:
             throw new Error(`Tool not found: ${name}`);
@@ -106,7 +101,7 @@ async function startServer() {
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.error('DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP server started and listening on stdio');
+    console.error('DuckDuckGo, IAsk AI & Monica AI Search MCP server started and listening on stdio');
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
@@ -120,7 +115,7 @@ const versionFlag = args.includes('--version') || args.includes('-v');
 
 if (helpFlag) {
   console.log(`
-DuckDuckGo, IAsk AI, Monica & Brave AI Search MCP - A Model Context Protocol server for web search
+DuckDuckGo, IAsk AI & Monica AI Search MCP - A Model Context Protocol server for web search
 
 Usage:
   npx -y @oevortex/ddg_search@latest [options]
@@ -133,7 +128,6 @@ This MCP server provides the following tools:
   - web-search: Search the web using DuckDuckGo
   - iask-search: Search using IAsk AI for AI-generated responses
   - monica-search: Search using Monica AI for AI-generated responses
-  - brave-search: Search using Brave AI for AI-generated responses
 
 Created by @OEvortex
 Subscribe to youtube.com/@OEvortex for more tools and tutorials!

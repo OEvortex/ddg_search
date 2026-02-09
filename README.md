@@ -211,15 +211,6 @@ Or if installed globally:
     </ul>
     <i>Example: Search Monica AI for "Latest advancements in AI"</i>
   </div>
-  <div style="margin-bottom: 1.5em;">
-    <b>🛡️ Brave AI Search Tool</b><br/>
-    <code>brave-search</code><br/>
-    <ul>
-      <li><b>query</b> (string, required): The search query or question</li>
-      <li><b>enableResearch</b> (boolean, optional, default: false): Enable deep research mode</li>
-    </ul>
-    <i>Example: Search Brave AI for "Summarize the latest AI safety research"</i>
-  </div>
 </div>
 
 ---
@@ -235,13 +226,11 @@ src/
     searchTool.js
     iaskTool.js
     monicaTool.js
-    braveTool.js
   utils/
     search.js     # Search and URL utilities
     user_agents.js
     search_monica.js
     search_iask.js # IAsk AI search utilities
-    search_brave_ai.js
 package.json
 README.md
 ```
