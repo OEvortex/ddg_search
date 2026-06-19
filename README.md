@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/oevortex-ddg-search-badge.png)](https://mseep.ai/app/oevortex-ddg-search)
+
 <div align="center">
   <a href="https://www.npmjs.com/package/@oevortex/ddg_search">
     <img src="https://img.shields.io/npm/v/@oevortex/ddg_search.svg" alt="npm version" />
