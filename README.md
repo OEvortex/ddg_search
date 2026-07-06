@@ -124,6 +124,14 @@ Single unified tool `web-search`:
 | `iaskMode` | string | `"thinking"` | IAsk mode (backend=iask only) |
 | `detailLevel` | string | — | IAsk detail level (backend=iask only) |
 
+## Agent Prompt
+
+Add this to your agent's system prompt to enable web search:
+
+```
+Web search with: npx -y @oevortex/ddg_search@latest "<query>" -m ai
+```
+
 ## Proxy Support
 
 Respects `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` environment variables automatically.
