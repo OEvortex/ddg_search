@@ -129,7 +129,15 @@ Single unified tool `web-search`:
 Add this to your agent's system prompt to enable web search:
 
 ```
-Web search with: npx -y @oevortex/ddg_search@latest "<query>" -m ai
+When you need to search the web or find current information, use the DDG Search CLI:
+
+  npx -y @oevortex/ddg_search@latest "<query>" -m ai
+
+This runs an AI-powered web search via IAsk. For standard DuckDuckGo results (titles + URLs + snippets), use mode "web" instead:
+
+  npx -y @oevortex/ddg_search@latest "<query>" -m web -n 5
+
+For a different AI backend (Monica), add -b monica. Use this for any research, fact-checking, or current events task.
 ```
 
 ## Proxy Support

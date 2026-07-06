@@ -1,6 +1,27 @@
 # Changelog
- 
+
 All notable changes to this project will be documented in this file.
+
+## [1.4.0] - 2026-07-06
+
+### Added
+- Unified `web-search` tool replacing separate `iask-search` and `monica-search` tools
+- CLI mode for direct command-line usage (not just MCP server)
+- `ddg` short alias alongside `ddg-search-mcp`
+- Agent skill at `skills/ddg-search/` for marketplace installation
+- Proxy support via `HTTP_PROXY`, `HTTPS_PROXY`, `NO_PROXY` environment variables
+
+### Changed
+- Single tool with `mode` parameter: `web` (DuckDuckGo) or `ai` (IAsk/Monica)
+- `backend` parameter selects AI provider: `iask` (default) or `monica`
+- Improved tool definition descriptions and parameter documentation
+- Rewritten README with CLI, MCP, and programmatic API docs
+
+### Fixed
+- HTTP proxy handling — removed hardcoded `httpsAgent` that broke proxy tunneling
+
+### Removed
+- `iask-tool.js` and `monicaTool.js` (dead code after unification)
 
 ## [1.2.2] - 2026-02-09
 
