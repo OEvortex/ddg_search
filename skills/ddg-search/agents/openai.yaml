@@ -1,0 +1,4 @@
+interface:
+  display_name: "DDG Search"
+  short_description: "Search the web and get AI answers using DuckDuckGo, IAsk AI, or Monica AI"
+  default_prompt: "Search the web for information about"
